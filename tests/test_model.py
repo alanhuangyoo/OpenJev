@@ -43,6 +43,17 @@ def test_packed_questions_match_separate_calls(model):
 
 
 @torch.no_grad()
+def test_rows_match_packed(model):
+    """The row form (used for hybrid backbones) gives the packed form's logits."""
+    from wev.model import encode
+    tok, m = model
+    encs = [encode(tok, {"state": STATE, "questions": Q}), encode(tok, {"state": "hi", "questions": Q[:1]})]
+    for rec_p, rec_r in zip(m.forward_batch(encs), m.forward_rows_batch(encs)):
+        for zp, zr in zip(rec_p, rec_r):
+            assert rel(zr, zp) < 1e-3
+
+
+@torch.no_grad()
 def test_padding_does_not_change_results(model):
     from wev.model import encode
     tok, m = model
