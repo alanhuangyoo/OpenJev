@@ -5,7 +5,8 @@ operation and, if that operation has a target question, one target. The answers 
 choice, so the client acts on it. Each request is logged with its labels, keyed by the client's bearer token, which
 the collector sets to a per-episode id; episodes are filtered for success afterwards.
 
-Credentials come from the environment only: WEV_JUDGE_BASE_URL, WEV_JUDGE_API_KEY; TEACHER_MODEL (default qwen3-max).
+Credentials come from the environment only: WEV_JUDGE_BASE_URL, WEV_JUDGE_API_KEY; TEACHER_MODEL (default qwen3-max);
+TEACHER_EFFORT (low | high | max) for models that cannot switch thinking off.
 
     python scripts/teacher_server.py --log teacher.jsonl --port 8010
 """
@@ -61,17 +62,21 @@ def render(body: dict) -> str:
 
 
 def llm(messages):
-    body = json.dumps({"model": CFG["model"], "messages": messages, "temperature": 0, "max_tokens": 300,
-                       "response_format": {"type": "json_object"}, "enable_thinking": False}).encode()
-    for attempt in range(5):
+    body = {"model": CFG["model"], "messages": messages, "temperature": 0, "max_tokens": 300,
+            "response_format": {"type": "json_object"}, "enable_thinking": False}
+    if os.environ.get("TEACHER_EFFORT"):   # models that always think (GLM) take a reasoning level, not enable_thinking
+        body.pop("enable_thinking")
+        body.update(max_tokens=2000, reasoning_effort=os.environ["TEACHER_EFFORT"])
+    body = json.dumps(body).encode()
+    for attempt in range(8):
         req = urllib.request.Request(CFG["base"].rstrip("/") + "/chat/completions", data=body,
                                      headers={"content-type": "application/json", "authorization": f"Bearer {CFG['key']}"})
         try:
             return json.load(urllib.request.urlopen(req, timeout=90))["choices"][0]["message"]["content"]
         except (urllib.error.URLError, TimeoutError) as e:
-            if attempt == 4:
+            if attempt == 7:
                 raise
-            time.sleep(2 ** attempt if not isinstance(e, urllib.error.HTTPError) or e.code in (429, 500, 502, 503) else 1)
+            time.sleep(min(2 ** attempt, 30) if not isinstance(e, urllib.error.HTTPError) or e.code in (429, 500, 502, 503) else 1)
 
 
 def decide(body: dict):

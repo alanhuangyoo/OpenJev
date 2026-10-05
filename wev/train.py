@@ -163,15 +163,17 @@ def main():
     params = model.trainable_parameters()
     ckpt = out / "ckpt"
     history, step, ep0, g0 = [], 0, 0, 0
-    if a.resume and (ckpt / "progress.json").exists():
+    # a kill during a save leaves the newest complete checkpoint in one of these; progress.json is written last
+    src = next((d for d in (ckpt, out / "ckpt.old", out / "ckpt.tmp") if (d / "progress.json").exists()), ckpt)
+    if a.resume and (src / "progress.json").exists():
         from peft import set_peft_model_state_dict
         from safetensors.torch import load_file
-        set_peft_model_state_dict(model.lm, load_file(str(ckpt / "adapter_model.safetensors"), device=str(dev)))
-        model.head.load_state_dict(torch.load(ckpt / "head.pt", map_location=dev)["head"])
-        opt.load_state_dict(torch.load(ckpt / "optimizer.pt", map_location=dev))
-        prog = json.loads((ckpt / "progress.json").read_text())
+        set_peft_model_state_dict(model.lm, load_file(str(src / "adapter_model.safetensors"), device=str(dev)))
+        model.head.load_state_dict(torch.load(src / "head.pt", map_location=dev)["head"])
+        opt.load_state_dict(torch.load(src / "optimizer.pt", map_location=dev))
+        prog = json.loads((src / "progress.json").read_text())
         history, step, ep0, g0 = prog["history"], prog["step"], prog["epoch"], prog["batch"]
-        log(f"resumed from {ckpt}: epoch {ep0}, batch {g0}, step {step}", flush=True)
+        log(f"resumed from {src}: epoch {ep0}, batch {g0}, step {step}", flush=True)
 
     def save_ckpt(ep, g):
         tmp = out / "ckpt.tmp"
@@ -179,8 +181,12 @@ def main():
         model.save(tmp)
         torch.save(opt.state_dict(), tmp / "optimizer.pt")
         (tmp / "progress.json").write_text(json.dumps({"epoch": ep, "batch": g, "step": step, "history": history}))
-        shutil.rmtree(ckpt, ignore_errors=True)
+        old = out / "ckpt.old"   # only one checkpoint is kept; the previous one is deleted once the new one is in place
+        shutil.rmtree(old, ignore_errors=True)
+        if ckpt.exists():
+            ckpt.rename(old)
         tmp.rename(ckpt)
+        shutil.rmtree(old, ignore_errors=True)
 
     t0 = time.time()
     model.train()

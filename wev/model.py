@@ -12,6 +12,7 @@ Readout:   a pointer head scores each option's </opt> hidden state against the <
 import contextlib
 import math
 import re
+import threading
 from pathlib import Path
 
 import torch
@@ -167,6 +168,7 @@ class DecisionModel(nn.Module):
         attn = attn or ("sdpa" if str(device).startswith("cuda") else "eager")
         self.base, self.head_dim, self.device, self.lm_dtype = base, head_dim, device, dtype
         self.head_type, self.keep_layers, self.revision = head, keep_layers, revision
+        self._lock = threading.Lock()
         if backbone is not None:
             self.lm = backbone
         else:
@@ -244,7 +246,10 @@ class DecisionModel(nn.Module):
 
     @torch.no_grad()
     def probs(self, encs: list[dict]) -> list[list[list[float]]]:
-        return [[F.softmax(z, -1).tolist() for z in rec] for rec in self.forward_batch(encs)]
+        # one forward at a time: the GPU serialises them anyway, and the Triton autotuner behind the Gated DeltaNet
+        # kernels of hybrid backbones is not thread-safe (concurrent server requests crash it)
+        with self._lock:
+            return [[F.softmax(z, -1).tolist() for z in rec] for rec in self.forward_batch(encs)]
 
     def trainable_parameters(self):
         return [p for p in self.parameters() if p.requires_grad]
