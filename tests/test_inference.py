@@ -44,6 +44,27 @@ def test_history_is_cut_last(small):
     assert enc["n_state"] <= 400
 
 
+def test_huge_element_label_is_cut(small):
+    req = request(text_words=10, n_options=0, n_history=0)
+    req.state["elements"][0]["label"] = "label " * 3000
+    enc, _ = small.encode(req)
+    assert enc["n_state"] <= 400
+
+
+def test_many_elements_are_halved(small):
+    req = request(text_words=10, n_options=0, n_history=0)
+    req.state["elements"] = [{"index": str(i)} for i in range(300)]
+    enc, _ = small.encode(req)
+    assert enc["n_state"] <= 400
+
+
+def test_huge_option_is_cut(small):
+    req = request(text_words=10, n_options=0, n_history=0)
+    req.questions["operation"].criteria["CLICK"] = "click " * 3000
+    enc, _ = small.encode(req)
+    assert len(enc["ids"]) - enc["n_state"] <= 400
+
+
 def test_unshrinkable_state_is_rejected():
     tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-0.6B-Base")
     tiny = WebDecide(tok, model=None, meta={"max_state": 20, "max_branch": 400}, name="t")

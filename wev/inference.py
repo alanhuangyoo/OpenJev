@@ -86,14 +86,20 @@ class WebDecide:
           2. page.url, to its first 300 characters (tracking parameters and inline data can run to thousands of tokens)
           3. the dropdown option lists inside state.elements (select targets repeat them in the question itself)
           4. recent_actions, down to the last 3
-        Raises ContextTooLong when a question itself does not fit or nothing is left to shrink."""
+          5. long strings inside state.elements, to 200 characters (one element can carry a whole page in its label)
+          6. state.elements, halved per try down to 20 (the questions list their candidates themselves)
+        A question that does not fit has the long strings in its options (criteria) cut to 300 characters, once.
+        Raises ContextTooLong when nothing is left to shrink."""
         req = copy.deepcopy(req)
         while True:
             rec, meta = to_record(req)
             try:
                 return encode(self.tokenizer, rec, self.max_state, self.max_branch, strict=True), meta
             except ContextTooLong as e:
-                if e.part != "state" or not _shrink_state(req.state):
+                if e.part == "state":
+                    if not _shrink_state(req.state):
+                        raise
+                elif not any([_cut_long_strings(q.criteria, 300) for q in req.questions.values() if q.criteria]):
                     raise
 
     def predict(self, state, questions, model: str | None = None) -> dict:
@@ -132,7 +138,25 @@ def _shrink_state(state) -> bool:
     if isinstance(history, list) and len(history) > 3:
         state["recent_actions"] = history[-3:]
         return True
+    if isinstance(elements, list):
+        if _cut_long_strings(elements, 200):
+            return True
+        if len(elements) > 20:
+            state["elements"] = elements[: max(20, len(elements) // 2)]
+            return True
     return False
+
+
+def _cut_long_strings(obj, limit: int) -> bool:
+    """Cut every string longer than limit inside nested dicts and lists, in place; True if anything was cut."""
+    cut = False
+    for k, v in list(obj.items() if isinstance(obj, dict) else enumerate(obj)):
+        if isinstance(v, str) and len(v) > limit:
+            obj[k] = v[:limit]
+            cut = True
+        elif isinstance(v, (dict, list)):
+            cut |= _cut_long_strings(v, limit)
+    return cut
 
 
 def load(path_or_repo: str, device: str | None = None, dtype=None) -> WebDecide:
