@@ -76,7 +76,8 @@
     <a class="btn alt" href="https://pypi.org/project/wev-ai/">pip install wev-ai</a>
   </div>
 
-  <p class="tagline">A local decision model for agents: typed questions in, calibrated probabilities out, in one forward
+  <p class="tagline"><b>v0.2:</b> wev-4b completes 39–41 of 153 live-website tasks (from 30), with calibrated
+  probabilities. A local decision model for agents: typed questions in, calibrated probabilities out, in one forward
   pass. No text generation, no API key.</p>
 
   <div class="fig"><img src="overview.png" alt="Interface distillation overview"></div>
@@ -84,9 +85,9 @@
   LLM judge keeps the verified episodes, and the wev student serves the same interface locally.</p>
 
   <div class="stats">
-    <div class="stat"><div class="v">76%</div><div class="l">browser steps right on unseen websites (next best open model: 21%)</div></div>
-    <div class="stat"><div class="v">30 / 153</div><div class="l">live-website tasks completed, on par with the qwen3-max teacher (27)</div></div>
-    <div class="stat"><div class="v">10–320 ms</div><div class="l">per decision on one RTX 5090; 77 ms on a laptop</div></div>
+    <div class="stat"><div class="v">79%</div><div class="l">browser steps right on unseen websites (next best open model: 21%)</div></div>
+    <div class="stat"><div class="v">39–41 / 153</div><div class="l">live-website tasks completed by wev-4b v0.2, vs 27 for the qwen3-max teacher</div></div>
+    <div class="stat"><div class="v">10–320 ms</div><div class="l">per decision on one RTX 5090 (wev-4b: 40 ms general, 184 ms browser step)</div></div>
     <div class="stat"><div class="v">36%</div><div class="l">of the teacher's own DONE claims rejected by the judge</div></div>
   </div>
 
@@ -112,7 +113,7 @@
     <div>
       <table>
         <tr><th>Model</th><th>Browser step</th><th>Transfer</th><th>Typed-dec.</th></tr>
-        <tr class="ours"><td>wev-4b</td><td class="best">75.9</td><td>73.8</td><td>79.4</td></tr>
+        <tr class="ours"><td>wev-4b (v0.2)</td><td class="best">78.8</td><td>81.4</td><td>78.8</td></tr>
         <tr class="ours"><td>wev-8b</td><td>75.5</td><td>77.2</td><td>79.1</td></tr>
         <tr class="ours"><td>wev-1.7b</td><td>68.2</td><td>65.5</td><td class="best">79.5</td></tr>
         <tr><td>Kev-4B</td><td>21.2</td><td class="best">82.1</td><td>65.1</td></tr>
@@ -129,7 +130,7 @@
   <h2>Models</h2>
   <table>
     <tr><th>Model</th><th>Size</th><th>Best for</th><th>General decision</th><th>Browser step</th></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-4b">wev-4b</a></td><td>8.1 GB</td><td>default; best on live websites</td><td>15 ms</td><td>217 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-4b">wev-4b</a> (v0.2)</td><td>8.4 GB</td><td>default; best on live websites</td><td>40 ms</td><td>184 ms</td></tr>
     <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-8b">wev-8b</a></td><td>15.2 GB</td><td>most accurate out of domain</td><td>21 ms</td><td>322 ms</td></tr>
     <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-1.7b">wev-1.7b</a></td><td>3.5 GB</td><td>laptops; the fastest</td><td>10 ms</td><td>91 ms</td></tr>
   </table>
