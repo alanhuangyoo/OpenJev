@@ -1,0 +1,184 @@
+{
+ "benchmark": "wev-bench",
+ "version": "1.0",
+ "lane": "browser",
+ "key": "wev-4b-v0.2",
+ "display": "wev-4b-v0.2",
+ "class": "browser-system-one",
+ "open": "yes",
+ "author": "",
+ "repo": "",
+ "licence": "",
+ "underlying": "",
+ "has_distribution": true,
+ "probability_source": [
+  "native"
+ ],
+ "browser": {
+  "n_items": 2346,
+  "n_attempted": 2346,
+  "n_ok": 2346,
+  "n_valid": 2346,
+  "coverage": 1.0,
+  "success_rate": 1.0,
+  "accuracy": 0.7310315430520035,
+  "step_success": 0.7310315430520035,
+  "operation_accuracy": 0.8473998294970162,
+  "target_accuracy": 0.8137092316196793,
+  "n_targets": 1809,
+  "premature_done_rate": 0.03265940902021773,
+  "done_recall": 0.8800959232613909,
+  "ece": 0.012982310469314882,
+  "ece_operation": 0.02177723785166275,
+  "ece_target": 0.019820287451631093,
+  "brier_operation": 0.2076388381713555,
+  "has_distribution": true,
+  "mean_input_tokens": 2847.7523444160274,
+  "operation_by_gold": {
+   "BLOCKED": {
+    "n": 29,
+    "recall": 0.1724137931034483,
+    "predicted": {
+     "BLOCKED": 5,
+     "CLICK": 17,
+     "DONE": 5,
+     "TYPE_TEXT": 2
+    }
+   },
+   "CLICK": {
+    "n": 1362,
+    "recall": 0.8832599118942731,
+    "predicted": {
+     "CLICK": 1203,
+     "TYPE_TEXT": 96,
+     "SELECT": 6,
+     "DONE": 41,
+     "BLOCKED": 3,
+     "SCROLL_DOWN": 3,
+     "WAIT": 10
+    }
+   },
+   "DONE": {
+    "n": 417,
+    "recall": 0.8800959232613909,
+    "predicted": {
+     "DONE": 367,
+     "CLICK": 37,
+     "SCROLL_DOWN": 1,
+     "TYPE_TEXT": 8,
+     "WAIT": 4
+    }
+   },
+   "SCROLL_DOWN": {
+    "n": 55,
+    "recall": 0.16363636363636364,
+    "predicted": {
+     "DONE": 13,
+     "CLICK": 27,
+     "TYPE_TEXT": 4,
+     "SCROLL_DOWN": 9,
+     "WAIT": 2
+    }
+   },
+   "SCROLL_UP": {
+    "n": 8,
+    "recall": 0.0,
+    "predicted": {
+     "SCROLL_DOWN": 1,
+     "CLICK": 7
+    }
+   },
+   "SELECT": {
+    "n": 72,
+    "recall": 0.9722222222222222,
+    "predicted": {
+     "SELECT": 70,
+     "CLICK": 2
+    }
+   },
+   "TYPE_TEXT": {
+    "n": 383,
+    "recall": 0.825065274151436,
+    "predicted": {
+     "TYPE_TEXT": 316,
+     "CLICK": 63,
+     "DONE": 3,
+     "SCROLL_DOWN": 1
+    }
+   },
+   "WAIT": {
+    "n": 20,
+    "recall": 0.9,
+    "predicted": {
+     "WAIT": 18,
+     "DONE": 1,
+     "CLICK": 1
+    }
+   }
+  },
+  "latency_p50_s": 0.15299850149312988,
+  "latency_p95_s": 0.35323224624153227,
+  "latency_p50_ms": 153.0,
+  "latency_p95_ms": 353.2,
+  "by_family": {
+   "mind2web": {
+    "n_items": 873,
+    "step_success": 0.7995418098510882,
+    "operation_accuracy": 0.9312714776632303,
+    "target_accuracy": 0.8531791907514451,
+    "premature_done_rate": 0.002290950744558992,
+    "ece": 0.007692002301497593
+   },
+   "nnetnav_audited": {
+    "n_items": 1150,
+    "step_success": 0.6704347826086956,
+    "operation_accuracy": 0.7939130434782609,
+    "target_accuracy": 0.7290132547864506,
+    "premature_done_rate": 0.078125,
+    "ece": 0.022062110442865025
+   },
+   "onpolicy_glm": {
+    "n_items": 119,
+    "step_success": 0.7394957983193278,
+    "operation_accuracy": 0.773109243697479,
+    "target_accuracy": 0.9223300970873787,
+    "premature_done_rate": 0.0,
+    "ece": 0.03820405405405402
+   },
+   "teacher_glm": {
+    "n_items": 147,
+    "step_success": 0.7755102040816326,
+    "operation_accuracy": 0.8231292517006803,
+    "target_accuracy": 0.8925619834710744,
+    "premature_done_rate": 0.007575757575757576,
+    "ece": 0.06007164179104503
+   },
+   "teacher_qwen3max": {
+    "n_items": 57,
+    "step_success": 0.7719298245614035,
+    "operation_accuracy": 0.8596491228070176,
+    "target_accuracy": 0.8780487804878049,
+    "premature_done_rate": 0.0,
+    "ece": 0.10298061224489795
+   }
+  },
+  "errors": {}
+ },
+ "speed_block": {
+  "measured_where": "client on the same host as the endpoint",
+  "hardware": "RTX 5090, bf16",
+  "n": 2346,
+  "p50_s": 0.15299850149312988,
+  "p95_s": 0.35323224624153227,
+  "run": "serial 2346-step run, 3 warm-up requests excluded"
+ },
+ "endpoint_condition": "RTX 5090, bf16",
+ "note": "",
+ "data": {
+  "file": "hfdata-v2/wev-data-r/bench/test.parquet",
+  "sha256": "b6175f8569a280ba4a686c6d2d08bc030943b8aeede8c9543cb609d91a3a3c88",
+  "n": 2346,
+  "limit": null
+ },
+ "created": "2026-10-06T09:57:35+00:00"
+}

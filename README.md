@@ -161,7 +161,8 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 <p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/wev/main/assets/stopping.png" width="55%" alt="DONE recall against premature DONE rate as the threshold on the DONE probability is swept."></p>
 
 The hardest browser decision is when to stop. Accepting DONE only above a probability threshold trades missed stops
-for early ones: at 0.8, wev-4b stops early on 3.8% of unfinished steps (8.5% at 0.5), and wev-8b on 1.7%.
+for early ones: at 0.8, wev-4b v0.1 stops early on 3.8% of unfinished steps (8.5% at 0.5), and wev-8b on 1.7%.
+wev-4b v0.2 stops early on 3.3% of wev-bench's unfinished steps at its default argmax.
 
 </details>
 
@@ -177,7 +178,7 @@ premature-DONE rate, ECE and p50/p95 latency, overall and per subset. It needs o
 ```bash
 wev serve --model alanhuangya/wev-4b --port 8009          # or any System One server
 python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name wev-4b \
-  --hardware "RTX 5090, bf16" --out results/wev-bench/wev-4b.json
+  --hardware "RTX 5090, bf16" --out results/wev-bench/wev-4b-v0.2.json
 ```
 
 Add `--revision <commit>` to pin the dataset, `--api_key_env NAME` to send a bearer token from an environment
@@ -188,10 +189,11 @@ per-system layout with a `browser` lane block, so it can be submitted to a JevBe
 
 | System One | Step success | Operation | Target | Premature DONE | ECE | p50 / p95 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| wev-4b | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
+| **wev-4b v0.2** | **73.1** | **84.7** | **81.4** | **3.3** | **0.013** | **153 / 353 ms** |
+| wev-4b v0.1 | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
 
-wev-4b on one RTX 5090 (bf16), queried serially from the same host;
-[`results/wev-bench/wev-4b.json`](https://github.com/alanhuangyoo/wev/tree/main/results/wev-bench) has the full result.
+One RTX 5090 (bf16), queried serially from the same host;
+[`results/wev-bench/`](https://github.com/alanhuangyoo/wev/tree/main/results/wev-bench) has the full results.
 
 ## How it works
 
@@ -234,7 +236,17 @@ python -m wev.webchain --out data/webchain-v1 --max_traces 4000   # downloads We
 python scripts/judge_done.py --data data/nnetnav-v2/train.jsonl --out judge-train.jsonl
 python scripts/apply_judge.py --data data/nnetnav-v2 --judge 'judge-{split}.jsonl' --out data/nnetnav-v3-clean
 
-# the wev-4b recipe; dir:K repeats a training file K times. One GPU works too: drop torchrun.
+# wev-4b v0.2: continue from Kev-4B on the v0.1 mix, then add the GLM teacher episodes (resumable: rerun the same
+# line after a kill, on any number of GPUs), export, and fit the serving temperature on dev rows
+torchrun --nproc_per_node 8 -m wev.train --init_from jaredpalmer/kev-4b --lr 5e-5 --global_accum 8 --epochs 1 \
+  --batch_tokens 4000 --resume --out runs/wev-4b-a --data <the v0.1 mix below>
+torchrun --nproc_per_node 8 -m wev.train --init_from runs/wev-4b-a --lr 3e-5 --global_accum 8 --epochs 1 \
+  --batch_tokens 4000 --resume --out runs/wev-4b-v0.2 \
+  --data data/teacher-v3-glm:3,data/teacher-v1,data/teacher-v2,data/m2w-v2,data/nnetnav-v3-clean,data/general/kev-v7,data/general/typed-decisions-train:2,data/ext/td-synth
+wev export --run runs/wev-4b-v0.2 --out exports/wev-4b
+python scripts/calibrate.py --model exports/wev-4b --data data/m2w-v2 data/nnetnav-v3-clean data/teacher-v3-glm data/general/kev-v7 data/general/typed-decisions-train
+
+# the wev-4b v0.1 recipe; dir:K repeats a training file K times. One GPU works too: drop torchrun.
 # wev-8b and wev-1.7b use the same mix without data/teacher-v2.
 torchrun --nproc_per_node 8 -m wev.train --base Qwen/Qwen3-4B-Base --head pointer --lr 1e-4 --epochs 1 \
   --batch_tokens 6000 --accum 1 --checkpointing 0 --out runs/wev-4b \

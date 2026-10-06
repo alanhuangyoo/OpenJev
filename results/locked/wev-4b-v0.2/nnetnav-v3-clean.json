@@ -1,0 +1,114 @@
+{
+  "run": "exports/G-glm-4b",
+  "split": "test",
+  "dropped": 0,
+  "n": 1150,
+  "step_success": 0.6678,
+  "latency_ms_median": 112.6,
+  "latency_ms_p90": 205.5,
+  "operation_by_gold": {
+    "BLOCKED": {
+      "n": 29,
+      "recall": 0.1724
+    },
+    "CLICK": {
+      "n": 478,
+      "recall": 0.8117
+    },
+    "DONE": {
+      "n": 382,
+      "recall": 0.8743
+    },
+    "SCROLL_DOWN": {
+      "n": 52,
+      "recall": 0.1731
+    },
+    "SCROLL_UP": {
+      "n": 8,
+      "recall": 0.0
+    },
+    "TYPE_TEXT": {
+      "n": 201,
+      "recall": 0.8706
+    }
+  },
+  "premature_done_rate": 0.0781,
+  "operation_confusion": {
+    "CLICK": {
+      "CLICK": 388,
+      "TYPE_TEXT": 45,
+      "DONE": 39,
+      "BLOCKED": 3,
+      "SCROLL_DOWN": 3
+    },
+    "DONE": {
+      "DONE": 334,
+      "CLICK": 39,
+      "SCROLL_DOWN": 1,
+      "TYPE_TEXT": 8
+    },
+    "TYPE_TEXT": {
+      "TYPE_TEXT": 175,
+      "CLICK": 23,
+      "DONE": 3
+    },
+    "SCROLL_DOWN": {
+      "DONE": 13,
+      "CLICK": 27,
+      "TYPE_TEXT": 3,
+      "SCROLL_DOWN": 9
+    },
+    "BLOCKED": {
+      "BLOCKED": 5,
+      "CLICK": 17,
+      "DONE": 5,
+      "TYPE_TEXT": 2
+    },
+    "SCROLL_UP": {
+      "SCROLL_DOWN": 1,
+      "CLICK": 7
+    }
+  },
+  "operation": {
+    "n": 1150,
+    "accuracy": 0.7922,
+    "ece": 0.028,
+    "mean_confidence": 0.7684,
+    "chance": 0.1776
+  },
+  "all_questions": {
+    "n": 1829,
+    "accuracy": 0.7682,
+    "ece": 0.0216,
+    "mean_confidence": 0.7526,
+    "chance": 0.2313
+  },
+  "target": {
+    "n": 679,
+    "accuracy": 0.7275,
+    "ece": 0.024,
+    "mean_confidence": 0.726,
+    "chance": 0.3223
+  },
+  "click_target": {
+    "n": 478,
+    "accuracy": 0.6255,
+    "ece": 0.0384,
+    "mean_confidence": 0.6195,
+    "chance": 0.0717
+  },
+  "target_k>1": {
+    "n": 504,
+    "accuracy": 0.6329,
+    "ece": 0.0323,
+    "mean_confidence": 0.6308,
+    "chance": 0.087
+  },
+  "type_text_target": {
+    "n": 201,
+    "accuracy": 0.9701,
+    "ece": 0.0192,
+    "mean_confidence": 0.9791,
+    "chance": 0.9183
+  }
+}

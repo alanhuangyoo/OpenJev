@@ -1,0 +1,130 @@
+{
+  "run": "exports/G-glm-4b",
+  "split": "test",
+  "dropped": 0,
+  "n": 1176,
+  "step_success": 0.8648,
+  "latency_ms_median": 22.9,
+  "latency_ms_p90": 34.3,
+  "operation_by_gold": {},
+  "operation_confusion": {},
+  "intent": {
+    "n": 116,
+    "accuracy": 0.8276,
+    "ece": 0.0827,
+    "mean_confidence": 0.8181,
+    "chance": 0.013
+  },
+  "all_questions": {
+    "n": 1440,
+    "accuracy": 0.8812,
+    "ece": 0.0114,
+    "mean_confidence": 0.888,
+    "chance": 0.3004
+  },
+  "answer": {
+    "n": 80,
+    "accuracy": 0.8875,
+    "ece": 0.0626,
+    "mean_confidence": 0.9101,
+    "chance": 0.5
+  },
+  "topic": {
+    "n": 116,
+    "accuracy": 0.8879,
+    "ece": 0.0592,
+    "mean_confidence": 0.8684,
+    "chance": 0.2448
+  },
+  "is_sports": {
+    "n": 47,
+    "accuracy": 0.9787,
+    "ece": 0.0331,
+    "mean_confidence": 0.9832,
+    "chance": 0.5
+  },
+  "is_business": {
+    "n": 43,
+    "accuracy": 0.8837,
+    "ece": 0.1004,
+    "mean_confidence": 0.9021,
+    "chance": 0.5
+  },
+  "is_scitech": {
+    "n": 49,
+    "accuracy": 0.9592,
+    "ece": 0.0301,
+    "mean_confidence": 0.9293,
+    "chance": 0.5
+  },
+  "is_world": {
+    "n": 45,
+    "accuracy": 0.9556,
+    "ece": 0.0622,
+    "mean_confidence": 0.9295,
+    "chance": 0.5
+  },
+  "relation": {
+    "n": 116,
+    "accuracy": 0.8879,
+    "ece": 0.0326,
+    "mean_confidence": 0.8985,
+    "chance": 0.3247
+  },
+  "sentiment": {
+    "n": 80,
+    "accuracy": 0.6375,
+    "ece": 0.0915,
+    "mean_confidence": 0.6828,
+    "chance": 0.2
+  },
+  "rating": {
+    "n": 80,
+    "accuracy": 0.6375,
+    "ece": 0.1146,
+    "mean_confidence": 0.7355,
+    "chance": 0.2
+  },
+  "recommend": {
+    "n": 80,
+    "accuracy": 0.925,
+    "ece": 0.036,
+    "mean_confidence": 0.9334,
+    "chance": 0.5
+  },
+  "answer_type": {
+    "n": 116,
+    "accuracy": 0.9569,
+    "ece": 0.0213,
+    "mean_confidence": 0.9548,
+    "chance": 0.1642
+  },
+  "category": {
+    "n": 116,
+    "accuracy": 1.0,
+    "ece": 0.0264,
+    "mean_confidence": 0.9736,
+    "chance": 0.0709
+  },
+  "stars": {
+    "n": 80,
+    "accuracy": 0.5875,
+    "ece": 0.1069,
+    "mean_confidence": 0.6713,
+    "chance": 0.2
+  },
+  "positive": {
+    "n": 80,
+    "accuracy": 0.9625,
+    "ece": 0.038,
+    "mean_confidence": 0.9655,
+    "chance": 0.5
+  },
+  "decision": {
+    "n": 196,
+    "accuracy": 0.9949,
+    "ece": 0.0273,
+    "mean_confidence": 0.9738,
+    "chance": 0.3963
+  }
+}

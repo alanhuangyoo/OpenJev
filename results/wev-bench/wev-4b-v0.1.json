@@ -1,0 +1,177 @@
+{
+ "benchmark": "wev-bench",
+ "version": "1.0",
+ "lane": "browser",
+ "key": "wev-4b",
+ "display": "wev-4b (v3)",
+ "class": "browser-system-one",
+ "open": "yes",
+ "author": "Jun Huang, Xin Ren",
+ "repo": "https://huggingface.co/alanhuangya/wev-4b",
+ "licence": "Apache-2.0",
+ "underlying": "Qwen3-4B-Base with a pointer head, 4B",
+ "has_distribution": true,
+ "probability_source": [
+  "native"
+ ],
+ "browser": {
+  "n_items": 2346,
+  "n_attempted": 2346,
+  "n_ok": 2346,
+  "n_valid": 2346,
+  "coverage": 1.0,
+  "success_rate": 1.0,
+  "accuracy": 0.6798806479113384,
+  "step_success": 0.6798806479113384,
+  "operation_accuracy": 0.8132992327365729,
+  "target_accuracy": 0.7904919845218352,
+  "n_targets": 1809,
+  "premature_done_rate": 0.05028512182477968,
+  "done_recall": 0.8609112709832134,
+  "ece": 0.051390300842357524,
+  "ece_operation": 0.06100366581415261,
+  "ece_target": 0.03937562189054726,
+  "brier_operation": 0.2740616143478261,
+  "has_distribution": true,
+  "mean_input_tokens": 2783.7544757033247,
+  "operation_by_gold": {
+   "BLOCKED": {
+    "n": 29,
+    "recall": 0.034482758620689655,
+    "predicted": {
+     "DONE": 8,
+     "CLICK": 16,
+     "TYPE_TEXT": 4,
+     "BLOCKED": 1
+    }
+   },
+   "CLICK": {
+    "n": 1362,
+    "recall": 0.8671071953010279,
+    "predicted": {
+     "CLICK": 1181,
+     "TYPE_TEXT": 100,
+     "SELECT": 15,
+     "DONE": 64,
+     "SCROLL_DOWN": 1,
+     "WAIT": 1
+    }
+   },
+   "DONE": {
+    "n": 417,
+    "recall": 0.8609112709832134,
+    "predicted": {
+     "CLICK": 55,
+     "DONE": 359,
+     "TYPE_TEXT": 3
+    }
+   },
+   "SCROLL_DOWN": {
+    "n": 55,
+    "recall": 0.0,
+    "predicted": {
+     "DONE": 12,
+     "CLICK": 42,
+     "WAIT": 1
+    }
+   },
+   "SCROLL_UP": {
+    "n": 8,
+    "recall": 0.0,
+    "predicted": {
+     "CLICK": 8
+    }
+   },
+   "SELECT": {
+    "n": 72,
+    "recall": 0.8888888888888888,
+    "predicted": {
+     "SELECT": 64,
+     "CLICK": 8
+    }
+   },
+   "TYPE_TEXT": {
+    "n": 383,
+    "recall": 0.783289817232376,
+    "predicted": {
+     "TYPE_TEXT": 300,
+     "CLICK": 79,
+     "DONE": 4
+    }
+   },
+   "WAIT": {
+    "n": 20,
+    "recall": 0.15,
+    "predicted": {
+     "WAIT": 3,
+     "DONE": 9,
+     "CLICK": 8
+    }
+   }
+  },
+  "latency_p50_s": 0.16602498455904424,
+  "latency_p95_s": 0.40896649652859196,
+  "latency_p50_ms": 166.0,
+  "latency_p95_ms": 409.0,
+  "by_family": {
+   "mind2web": {
+    "n_items": 873,
+    "step_success": 0.7697594501718213,
+    "operation_accuracy": 0.9209621993127147,
+    "target_accuracy": 0.838150289017341,
+    "premature_done_rate": 0.0,
+    "ece": 0.01990914844649197
+   },
+   "nnetnav_audited": {
+    "n_items": 1150,
+    "step_success": 0.611304347826087,
+    "operation_accuracy": 0.7452173913043478,
+    "target_accuracy": 0.7128129602356407,
+    "premature_done_rate": 0.1015625,
+    "ece": 0.0584226899945324
+   },
+   "onpolicy_glm": {
+    "n_items": 119,
+    "step_success": 0.6302521008403361,
+    "operation_accuracy": 0.7142857142857143,
+    "target_accuracy": 0.8349514563106796,
+    "premature_done_rate": 0.07142857142857142,
+    "ece": 0.17230450450450413
+   },
+   "teacher_glm": {
+    "n_items": 147,
+    "step_success": 0.6122448979591837,
+    "operation_accuracy": 0.7210884353741497,
+    "target_accuracy": 0.7851239669421488,
+    "premature_done_rate": 0.08333333333333333,
+    "ece": 0.19001007462686506
+   },
+   "teacher_qwen3max": {
+    "n_items": 57,
+    "step_success": 0.9649122807017544,
+    "operation_accuracy": 0.9824561403508771,
+    "target_accuracy": 0.975609756097561,
+    "premature_done_rate": 0.0,
+    "ece": 0.023471428571428532
+   }
+  },
+  "errors": {}
+ },
+ "speed_block": {
+  "measured_where": "client on the same host as the endpoint",
+  "hardware": "RTX 5090 32 GB, bf16, wev serve",
+  "n": 2346,
+  "p50_s": 0.16602498455904424,
+  "p95_s": 0.40896649652859196,
+  "run": "serial 2346-step run, 3 warm-up requests excluded"
+ },
+ "endpoint_condition": "RTX 5090 32 GB, bf16, wev serve",
+ "note": "",
+ "data": {
+  "file": "wev-data/bench/test.parquet",
+  "sha256": "06184b91a59945be3bbecfdda09b1bb0e4624019996975b249cb29a1e39f9f10",
+  "n": 2346,
+  "limit": null
+ },
+ "created": "2026-10-06T04:08:11+00:00"
+}
