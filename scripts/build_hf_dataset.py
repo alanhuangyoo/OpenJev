@@ -27,6 +27,8 @@ from urllib.parse import urlparse
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from redact import redact_row, unloaded_done
+
 SPLITS = {"train": "train", "dev": "validation", "test": "test"}
 SOURCES = {
     "mind2web": ["m2w-v2"],
@@ -118,6 +120,7 @@ def main():
 
     # config -> split -> flat rows
     built = defaultdict(lambda: defaultdict(list))
+    removed = Counter()   # rows dropped by redaction (card / SSN) or as DONE on a page that had not loaded
     sources = {}
     for config, dirs in SOURCES.items():
         if not all((data / d / "manifest.json").exists() for d in dirs):   # absent or still being built
@@ -128,6 +131,10 @@ def main():
             for raw, split in SPLITS.items():
                 if (data / d / f"{raw}.jsonl").exists():
                     for r in read_jsonl(data / d / f"{raw}.jsonl"):
+                        r = redact_row(r)
+                        if r is None or unloaded_done(r):
+                            removed[config, "pii" if r is None else "unloaded_done"] += 1
+                            continue
                         row = flat(config, d, r)
                         built[config][raw if config in TEACHER and raw == "dev" else split].append(row)
 
@@ -175,6 +182,7 @@ def main():
     ops = {c: {s: dict(Counter(r["operation"] for r in rows)) for s, rows in sp.items()} for c, sp in built.items()}
     ops["bench"] = {"test": dict(Counter(r["operation"] for r in bench))}
     manifest = {"doc": __doc__, "rows": counts, "operations": ops,
+                "removed": {f"{c}/{why}": n for (c, why), n in sorted(removed.items())},
                 "bench_subsets": dict(Counter(r["bench_subset"] for r in bench)),
                 "teacher_test_tasks": {c: len({r["task_id"] for r in built[c]["test"]})
                                        for c in TEACHER & built.keys()},

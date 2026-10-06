@@ -53,9 +53,6 @@ configs:
   - {split: test, path: bench/test.parquet}
 ---
 
-<!-- v2 DRAFT for review. Before upload: (1) decide on and apply the redaction listed under "Personal and sensitive
-information"; (2) regenerate the folder with scripts/build_hf_dataset.py; (3) copy this card to README.md there. -->
-
 # wev data
 
 **Jun Huang\*, Xin Ren\*** · University of Electronic Science and Technology of China · \*Equal contribution
@@ -90,12 +87,12 @@ bench    = load_dataset("alanhuangya/wev-data", "bench", split="test")  # wev-be
 
 | Config | Rows (train / validation / test) | Source | License |
 |---|---|---|---|
-| `mind2web` | 5,863 / 586 / 875 | [Mind2Web](https://huggingface.co/datasets/osunlp/Mind2Web), converted | CC BY 4.0 |
+| `mind2web` | 5,861 / 586 / 875 | [Mind2Web](https://huggingface.co/datasets/osunlp/Mind2Web), converted | CC BY 4.0 |
 | `nnetnav_audited` | 11,408 / 1,140 / 1,150 | [NNetNav-live](https://huggingface.co/datasets/stanfordnlp/nnetnav-live), converted, stopping labels audited | Apache-2.0 |
-| `webchain` | 17,877 / 1,069 / 1,589 | [WebChain](https://huggingface.co/datasets/webagentlab/webchain) v2, converted from its HTML snapshots | CC BY 4.0 |
-| `teacher_qwen3max` | 4,822 / 390 / 57 | qwen3-max as the System One of jev-ultrafast on live sites (two collections) | see *Terms* |
-| `teacher_glm` | 5,996 / 375 / 147 | GLM-5.3-Flash in the same role | see *Terms* |
-| `onpolicy_glm` | 5,790 / 275 / 119 | DAgger-style: a wev student or the GLM teacher acts, the GLM teacher labels | see *Terms* |
+| `webchain` | 17,876 / 1,069 / 1,589 | [WebChain](https://huggingface.co/datasets/webagentlab/webchain) v2, converted from its HTML snapshots | CC BY 4.0 |
+| `teacher_qwen3max` | 4,781 / 385 / 57 | qwen3-max as the System One of jev-ultrafast on live sites (two collections) | see *Terms* |
+| `teacher_glm` | 5,969 / 370 / 147 | GLM-5.3-Flash in the same role | see *Terms* |
+| `onpolicy_glm` | 5,782 / 275 / 119 | DAgger-style: a wev student or the GLM teacher acts, the GLM teacher labels | see *Terms* |
 | `live_tasks` | 1,402 / – / 153 | goals and start URLs for live runs; `test` is the held-out end-to-end suite | see *Terms* |
 | `bench` | – / – / 2,346 | wev-bench: frozen test steps from the configs above | per row's source |
 
@@ -250,8 +247,6 @@ included `mind2web`, `nnetnav_audited` and `teacher_qwen3max` train splits, so i
 
 ## Personal and sensitive information
 
-<!-- DRAFT: summarises scripts/scan_pii.py on this build; the redaction below is proposed, not yet applied. -->
-
 All step rows were scanned for e-mail addresses, phone numbers, card-like and SSN-like numbers, API-key, JWT and
 private-key shapes, credential-like URL parameters, values in password fields, and personal names typed into fields.
 Most matches are public business contacts in page text and element labels (phone numbers on 2,510 rows, e-mail
@@ -263,9 +258,12 @@ values typed into password fields by NNetNav's exploring agent (17 steps) and a 
 text: one Hugging Face token in a code sample on a public model page (2 rows) and one store loyalty number (2 rows).
 No credentials were entered by the teacher, which was instructed never to sign in.
 
-Proposed for release: replace typed e-mail addresses and phone numbers not dictated by the goal with placeholders,
-mask password-field values and URL token values as `<redacted>`, replace typed personal names not dictated by the goal
-with a fixed placeholder name, and mask the token and the loyalty number in page text.
+Applied in this release (`scripts/redact.py`, run by `scripts/build_hf_dataset.py`): typed e-mail addresses, phone
+numbers and personal names not dictated by the goal became `user@example.com`, `555-0100` and `Alex Doe`; values in
+password fields, API keys and tokens, and credential-like URL parameters became `<redacted>`; other e-mail addresses
+in page text and labels became `<email>`; the 3 rows with card- or SSN-like numbers were dropped. Published business
+phone numbers on public pages were kept. Separately, 86 teacher and on-policy steps labelled DONE on a page that had
+not loaded (no elements, almost no text) were dropped.
 
 ## Terms
 
@@ -317,9 +315,9 @@ If you use the converted configs, please also cite their sources:
 }
 @misc{webchain2026,
   title         = {WebChain: A Large-Scale Human-Annotated Dataset of Real-World Web Interaction Traces},
+  author        = {Sicheng Fan and Rui Wan and Yifei Leng and Gaoning Liang and Li Ling and Yanyi Shang and Dehan Kong},
   year          = {2026},
   eprint        = {2603.05295},
-  archivePrefix = {arXiv},
-  note          = {Authors as listed at https://arxiv.org/abs/2603.05295}
+  archivePrefix = {arXiv}
 }
 ```
