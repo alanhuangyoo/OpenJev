@@ -201,6 +201,24 @@ def convert_step(task, i, page: Page, rng, k_min, k_max, text_min, text_max):
         seen.add(key)
         negatives.append((el, d))
 
+    goal = task["confirmed_task"]
+    questions, labels, state_elements, n, gold_target = build_questions(
+        page, gold, gold_d, negatives, op, step["operation"]["value"], goal, rng, k_min, k_max)
+    state = {"page": {"url": "", "title": task["website"],
+                      "text": page.page_text(rng.randint(text_min, min(text_max, PAGE_TEXT_CHARS)))},
+             "elements": state_elements,
+             "recent_actions": recent_actions(task["action_reprs"][:i])}
+    meta = {"source": "mind2web", "annotation_id": task["annotation_id"], "action_uid": step["action_uid"],
+            "website": task["website"], "domain": task["domain"], "subdomain": task["subdomain"], "step": i,
+            "op": op, "k": n, "has_target": gold_target is not None}
+    return {"request": {"model": "wev-latest", "state": state, "questions": questions},
+            "labels": labels, "_meta": meta}, None
+
+
+def build_questions(page, gold, gold_d, negatives, op, value, goal, rng, k_min, k_max):
+    """Gold + sampled negatives -> (questions, labels, state elements, K, gold target key or None).
+
+    `page` provides describe(), operations() and select_options(); `value` is the requested SELECT option."""
     k = rng.randint(k_min, k_max)
     weights = [3.0 if (el.tag in INTERACTIVE_TAGS or d["role"] in INTERACTIVE_ROLES) else 1.0 for el, d in negatives]
     elements = [(gold, gold_d)] + _weighted_sample(negatives, weights, max(0, k - 1), rng)
@@ -220,7 +238,7 @@ def convert_step(task, i, page: Page, rng, k_min, k_max, text_min, text_max):
             e["value"], e["options"] = current, []
             options = list(enumerate(page.select_options(el), start=1))
             if len(options) > MAX_SELECT_OPTIONS:   # keep the requested option, sample the rest, keep page order
-                keep = {j for j, (olab, oval) in options if el is gold and _matches(olab, oval, step["operation"]["value"])}
+                keep = {j for j, (olab, oval) in options if el is gold and _matches(olab, oval, value)}
                 rest = [j for j, _ in options if j not in keep]
                 keep |= set(rng.sample(rest, MAX_SELECT_OPTIONS - len(keep)))
                 options = [(j, o) for j, o in options if j in keep]
@@ -229,7 +247,7 @@ def convert_step(task, i, page: Page, rng, k_min, k_max, text_min, text_max):
                 e["options"].append({"index": key, "label": f"{d['label']} → {olab}", "value": oval})
                 targets["SELECT"][key] = {"element": f"[{index}] {d['label']} → {olab}", "current_value": current,
                                           "role": d["role"]}
-                if el is gold and op == "SELECT" and gold_target is None and _matches(olab, oval, step["operation"]["value"]):
+                if el is gold and op == "SELECT" and gold_target is None and _matches(olab, oval, value):
                     gold_target = key
         for o in ("TYPE_TEXT", "CLICK"):
             if o in ops:
@@ -250,7 +268,6 @@ def convert_step(task, i, page: Page, rng, k_min, k_max, text_min, text_max):
     operations["WAIT"] = CONTROL_LABELS["WAIT"]
     operations.update(TERMINAL_LABELS)
 
-    goal = task["confirmed_task"]
     questions = {"operation": {"type": "choice", "criteria": operations,
                                "instructions": {"goal": goal, "rules": NEXT_ACTION}}}
     labels = {"operation": op}
@@ -259,16 +276,7 @@ def convert_step(task, i, page: Page, rng, k_min, k_max, text_min, text_max):
         questions[qid] = {"type": "choice", "criteria": targets[op],
                           "instructions": {"goal": goal, "operation": op, "rules": [NEXT_ACTION, TARGET]}}
         labels[qid] = gold_target
-
-    state = {"page": {"url": "", "title": task["website"],
-                      "text": page.page_text(rng.randint(text_min, min(text_max, PAGE_TEXT_CHARS)))},
-             "elements": state_elements,
-             "recent_actions": recent_actions(task["action_reprs"][:i])}
-    meta = {"source": "mind2web", "annotation_id": task["annotation_id"], "action_uid": step["action_uid"],
-            "website": task["website"], "domain": task["domain"], "subdomain": task["subdomain"], "step": i,
-            "op": op, "k": len(elements), "has_target": gold_target is not None}
-    return {"request": {"model": "wev-latest", "state": state, "questions": questions},
-            "labels": labels, "_meta": meta}, None
+    return questions, labels, state_elements, len(elements), gold_target
 
 
 def split_of(website: str, seed: int, dev_frac: float, test_frac: float) -> str:

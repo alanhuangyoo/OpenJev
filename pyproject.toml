@@ -1,6 +1,6 @@
 [project]
 name = "wev-ai"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local System-One decision model: typed questions in, calibrated probabilities out, one forward pass. General decisions and browser-agent steps; drop-in POST /v1/systemone."
 readme = "README.md"
 license = "Apache-2.0"
@@ -14,7 +14,7 @@ classifiers = [
 ]
 dependencies = [
     "torch>=2.8",
-    "transformers>=4.56,<5",
+    "transformers>=5.17,<6",
     "peft>=0.15",
     "pydantic>=2",
     "numpy",
@@ -27,8 +27,9 @@ wev = "wev.cli:main"
 
 [project.optional-dependencies]
 serve = ["fastapi", "uvicorn"]
-train = ["datasets>=3.0", "lxml>=5"]   # data converters (Mind2Web, NNetNav, general corpora)
-dev = ["pytest", "datasets>=3.0", "lxml>=5"]
+fast = ["flash-linear-attention"]   # Qwen3.5 (wev-4b v0.2) kernels on CUDA
+train = ["datasets>=3.0", "lxml>=5", "cssselect", "pyarrow"]   # data converters (Mind2Web, NNetNav, WebChain, general corpora)
+dev = ["pytest", "datasets>=3.0", "lxml>=5", "cssselect"]
 
 [project.urls]
 Homepage = "https://github.com/alanhuangyoo/wev"

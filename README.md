@@ -26,27 +26,33 @@ Typed questions in, calibrated probabilities out, in one forward pass. No text g
 agent monitoring, and it handles browser-agent steps: *which operation?* and *which element?* It runs on your own
 GPU, or on a laptop.
 
+**New in v0.2 (wev-4b):** live-website tasks completed rise from 30 to 39–41 of 153, out-of-domain general accuracy
+from 73.8 to 81.4, and browser steps on unseen websites from 75.9 to 78.8; probabilities are calibrated (ECE 0.01–0.04)
+and a browser step takes 184 ms. wev-8b and wev-1.7b are still v0.1.
+
 ## Highlights
 
-- 🌐 **Browser steps on unseen websites: 76% right**, where open decision models trained on general data reach at
+- 🌐 **Browser steps on unseen websites: 79% right**, where open decision models trained on general data reach at
   most 21%.
-- 🧠 **General decisions stay strong.** wev beats Laya on every general benchmark, and wev-8b is level with Kev-8B out
-  of domain.
-- 🎓 **As good as its teacher, locally.** As the System One of an open browser agent, wev completes as many live
-  tasks as the LLM it was distilled from.
-- ⚡ **Fast.** 10–37 ms for a general decision and 91–322 ms for a full browser page on one RTX 5090; 77 ms on a
+- 🧠 **General decisions stay strong.** wev-4b scores 88.1 on Kev decision-v7 and 81.4 out of domain, and wev beats
+  Laya on every general benchmark.
+- 🎓 **Better than its teacher, locally.** As the System One of an open browser agent, wev-4b completes 39–41 of 153
+  held-out live tasks, against 27 for the qwen3-max teacher.
+- ⚡ **Fast.** 10–40 ms for a general decision and 91–322 ms for a full browser page on one RTX 5090; 77 ms on a
   laptop.
-- 📏 **Calibrated.** Probabilities you can threshold: raise the bar for DONE and early stops drop from 8.5% to 3.8%.
+- 📏 **Calibrated.** Probabilities you can threshold: raise the bar for DONE and early stops drop sharply.
 
 ## Models
 
 | Model | Size | Best for | General decision | Browser step |
 |---|---|---|---|---|
-| [**wev-4b**](https://huggingface.co/alanhuangya/wev-4b) | 8.1 GB | the default: one consumer GPU, best on live websites | 15 ms | 217 ms |
-| [wev-8b](https://huggingface.co/alanhuangya/wev-8b) | 15.2 GB | the most accurate out of domain | 21 ms | 322 ms |
-| [wev-1.7b](https://huggingface.co/alanhuangya/wev-1.7b) | 3.5 GB | laptops and small GPUs; the fastest | 10 ms | 91 ms |
+| [**wev-4b**](https://huggingface.co/alanhuangya/wev-4b) (v0.2) | 8.4 GB | the default: one consumer GPU, best on live websites and out of domain | 40 ms | 184 ms |
+| [wev-8b](https://huggingface.co/alanhuangya/wev-8b) (v0.1) | 15.2 GB | a larger v0.1 model | 21 ms | 322 ms |
+| [wev-1.7b](https://huggingface.co/alanhuangya/wev-1.7b) (v0.1) | 3.5 GB | laptops and small GPUs; the fastest | 10 ms | 91 ms |
 
-*Median latency on one RTX 5090 (bf16), one request at a time.*
+*Median latency on one RTX 5090 (bf16), one request at a time. wev-4b v0.1 stays available as the `v0.1` revision:
+`wev.load("alanhuangya/wev-4b", revision="v0.1")`. wev-4b v0.2 runs on a Qwen3.5 backbone and needs transformers 5;
+`pip install "wev-ai[serve,fast]"` adds its fast kernels on CUDA.*
 
 ## Quickstart
 
@@ -96,8 +102,8 @@ most probable option taken as its answer. All numbers are on held-out test split
 
 | Model | Kev decision-v7 | Kev transfer-v4 | typed-decisions |
 |---|:---:|:---:|:---:|
+| **wev-4b** (v0.2) | 88.1 | 81.4 | 78.8 |
 | **wev-8b** | 82.4 | 77.2 | 79.1 |
-| **wev-4b** | 80.6 | 73.8 | 79.4 |
 | **wev-1.7b** | 81.1 | 65.5 | **79.5** |
 | Kev-4B | **88.2** | **82.1** | 65.1 |
 | Kev-8B | 88.1 | 76.8 | 62.7 |
@@ -109,7 +115,7 @@ operation and the target element are right.
 
 | Model | Step success | Operation |
 |---|:---:|:---:|
-| **wev-4b** | **75.9** | **91.2** |
+| **wev-4b** (v0.2) | **78.8** | **92.0** |
 | **wev-8b** | 75.5 | 90.3 |
 | **wev-1.7b** | 68.2 | 88.1 |
 | Kev-4B | 21.2 | 35.7 |
@@ -122,9 +128,13 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 
 | System One | Tasks completed |
 |---|:---:|
-| wev-4b | 30 / 153 |
+| wev-4b (v0.2) | 39–41 / 153 |
+| wev-4b (v0.1) | 30–31 / 153 |
 | wev-8b | 28 / 153 |
-| qwen3-max, prompted (the teacher) | 27 / 153 |
+| qwen3-max, prompted (teacher of v0.1) | 27 / 153 |
+| GLM-5.3-Flash, prompted (teacher added in v0.2) | 47 / 153 |
+
+*Ranges are two passes of the LLM judge over the same episodes.*
 
 <details>
 <summary><b>Notes on the comparison</b></summary>
@@ -137,8 +147,10 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
   Mind2Web requests beyond it count as wrong for wev.
 - Live sites change from run to run, so treat end-to-end gaps of a few tasks as noise. wev-4b's gain from its second
   teacher collection held on a paired comparison (10 tasks gained, 1 lost).
-- Test splits were held out from training and model selection, with one exception: wev-4b and wev-8b each had two
-  candidates, and both were read on test.
+- Test splits were held out from training and model selection, with one exception: wev-4b v0.1 and wev-8b each had
+  two candidates, and both were read on test. wev-4b v0.2 was read on test once (and its calibrated export once more;
+  the calibration is fitted on development rows and changes no answer).
+- wev-4b v0.2 continues training from the Kev-4B checkpoint (Apache-2.0); see its model card.
 - Raw results are in [`results/`](https://github.com/alanhuangyoo/wev/tree/main/results).
 
 </details>
@@ -152,6 +164,34 @@ The hardest browser decision is when to stop. Accepting DONE only above a probab
 for early ones: at 0.8, wev-4b stops early on 3.8% of unfinished steps (8.5% at 0.5), and wev-8b on 1.7%.
 
 </details>
+
+## wev-bench
+
+A frozen browser lane for decision models: 2,346 steps (Mind2Web test on unseen websites, audited NNetNav test with
+its stopping and giving-up steps, and teacher steps on tasks in no train split), stored as the `bench` config of
+[`alanhuangya/wev-data`](https://huggingface.co/datasets/alanhuangya/wev-data). `scripts/wev_bench.py` sends each
+stored request to any `POST /v1/systemone` endpoint and reports step success, operation and target accuracy, the
+premature-DONE rate, ECE and p50/p95 latency, overall and per subset. It needs only the standard library and
+`pyarrow`.
+
+```bash
+wev serve --model alanhuangya/wev-4b --port 8009          # or any System One server
+python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name wev-4b \
+  --hardware "RTX 5090, bf16" --out results/wev-bench/wev-4b.json
+```
+
+Add `--revision <commit>` to pin the dataset, `--api_key_env NAME` to send a bearer token from an environment
+variable, and `--steps_out steps.jsonl` to keep every prediction. Scoring follows
+[JevBench](https://github.com/fstandhartinger/jevbench) (argmax accuracy, top-label ECE over 10 bins, multi-class
+Brier, interpolated latency percentiles; failed or malformed answers count as wrong), and the output file uses its
+per-system layout with a `browser` lane block, so it can be submitted to a JevBench-style leaderboard as is.
+
+| System One | Step success | Operation | Target | Premature DONE | ECE | p50 / p95 |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| wev-4b | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
+
+wev-4b on one RTX 5090 (bf16), queried serially from the same host;
+[`results/wev-bench/wev-4b.json`](https://github.com/alanhuangyoo/wev/tree/main/results/wev-bench) has the full result.
 
 ## How it works
 
@@ -189,6 +229,7 @@ python -m wev.mind2web --out data/m2w-v2 --dev_frac 0.15 --test_frac 0.1
 python -m wev.nnetnav  --out data/nnetnav-v2
 python -m wev.general  --out data/general --kev_repo path/to/kev
 python -m wev.external --out data/ext
+python -m wev.webchain --out data/webchain-v1 --max_traces 4000   # downloads WebChain's per-step HTML snapshots
 # DONE relabelling of NNetNav by an LLM judge (OpenAI-compatible endpoint from WEV_JUDGE_BASE_URL / _API_KEY / _MODEL)
 python scripts/judge_done.py --data data/nnetnav-v2/train.jsonl --out judge-train.jsonl
 python scripts/apply_judge.py --data data/nnetnav-v2 --judge 'judge-{split}.jsonl' --out data/nnetnav-v3-clean
@@ -202,12 +243,17 @@ torchrun --nproc_per_node 8 -m wev.train --base Qwen/Qwen3-4B-Base --head pointe
 wev evaluate --model runs/wev-4b --data data/general/kev-transfer-v4 --split dev
 wev export --run runs/wev-4b --out exports/wev-4b --check data/general/typed-decisions/dev.jsonl
 pytest -q tests
+
+# the Hugging Face dataset (parquet configs + the wev-bench test set) and its PII scan
+python scripts/build_hf_dataset.py --data data --tasks tasks-v1.jsonl --out hf/wev-data
+python scripts/scan_pii.py --data hf/wev-data --out hf/pii-report.json
 ```
 
-The converted browser data and both teacher collections are on the Hub as
-[`alanhuangya/wev-data`](https://huggingface.co/datasets/alanhuangya/wev-data); `validation.jsonl` is read as the
-development split. To collect new teacher episodes, use `scripts/teacher_server.py`, `make_tasks.py`, `collect.py`
-and `build_teacher_data.py`.
+The converted browser data and the teacher collections are on the Hub as
+[`alanhuangya/wev-data`](https://huggingface.co/datasets/alanhuangya/wev-data); a downloaded config folder can be
+passed to `--data` as is (JSONL or parquet, `validation` is read as the development split). To collect new teacher
+episodes, use `scripts/teacher_server.py`, `make_tasks.py`, `collect.py` and `build_teacher_data.py`; for on-policy
+rows, `scripts/dagger_server.py` and `build_teacher_data.py --onpolicy`.
 
 </details>
 

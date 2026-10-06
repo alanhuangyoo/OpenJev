@@ -13,6 +13,13 @@ from .model import ContextTooLong, encode
 
 
 def read_jsonl(path):
+    """Rows of a JSONL file, or of a wev-data parquet file (request, labels and meta stored as JSON strings)."""
+    if str(path).endswith(".parquet"):
+        import pyarrow.parquet as pq
+        for r in pq.read_table(path, columns=["request", "labels", "meta"]).to_pylist():
+            yield {"request": json.loads(r["request"]), "labels": json.loads(r["labels"]),
+                   "_meta": json.loads(r["meta"])}
+        return
     with open(path) as f:
         for line in f:
             if line.strip():
@@ -78,10 +85,12 @@ def load_items(tok, path, max_state, max_branch, max_tokens=None, limit=None):
 
 
 def split_file(directory, split: str) -> Path:
-    """A split's file; "dev" and "validation" name the same split (Hugging Face datasets use "validation")."""
+    """A split's file, JSONL or parquet; "dev" and "validation" name the same split (Hugging Face datasets use
+    "validation")."""
     directory = Path(directory)
     names = [split] + {"dev": ["validation"], "validation": ["dev"]}.get(split, [])
     for name in names:
-        if (directory / f"{name}.jsonl").exists():
-            return directory / f"{name}.jsonl"
+        for ext in (".jsonl", ".parquet"):
+            if (directory / f"{name}{ext}").exists():
+                return directory / f"{name}{ext}"
     return directory / f"{split}.jsonl"

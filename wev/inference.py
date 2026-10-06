@@ -48,14 +48,14 @@ def default_dtype(device: str):
     return torch.bfloat16 if device.startswith("cuda") else torch.float32
 
 
-def _resolve(path_or_repo: str) -> Path:
+def _resolve(path_or_repo: str, revision: str | None = None) -> Path:
     p = Path(path_or_repo).expanduser()
     if p.is_dir():
         return p
     if path_or_repo.startswith(("/", ".", "~")) or p.exists():
         raise FileNotFoundError(f"{path_or_repo}: no such model directory")
     from huggingface_hub import snapshot_download
-    return Path(snapshot_download(path_or_repo, allow_patterns=["*.json", "*.safetensors", "*.pt", "*.txt", "*.jinja",
+    return Path(snapshot_download(path_or_repo, revision=revision, allow_patterns=["*.json", "*.safetensors", "*.pt", "*.txt", "*.jinja",
                                                                   "*.model", "*.md"]))
 
 
@@ -159,14 +159,16 @@ def _cut_long_strings(obj, limit: int) -> bool:
     return cut
 
 
-def load(path_or_repo: str, device: str | None = None, dtype=None) -> WebDecide:
+def load(path_or_repo: str, device: str | None = None, dtype=None, revision: str | None = None) -> WebDecide:
+    """An exported model or training run: local directory or Hub repo; revision pins a Hub tag or commit (e.g. "v0.1")."""
     device = device or default_device()
     dtype = dtype or default_dtype(device)
-    root = _resolve(path_or_repo)
+    root = _resolve(path_or_repo, revision)
     if (root / "wev.json").exists() or (root / "webdecide.json").exists():   # webdecide.json: pre-rename exports
         tok, model, meta = _load_exported(root, device, dtype)
     elif (root / "head.pt").exists():
         tok, model, meta = load_run(root, device, dtype=dtype)
     else:
         raise FileNotFoundError(f"{path_or_repo}: neither wev.json (exported) nor head.pt (training run)")
+    model.temperature = float(meta.get("temperature") or 1.0)
     return WebDecide(tok, model, meta, name=meta.get("name", Path(str(path_or_repo)).name))

@@ -27,8 +27,9 @@ from .model import MAX_BRANCH, MAX_STATE, DecisionModel, load_run
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data", required=True,
-                    help="comma-separated directories with train.jsonl and dev.jsonl; training mixes all train files, "
-                         "each dev file is scored separately. dir:K repeats that directory's train file K times")
+                    help="comma-separated directories with train and dev splits (.jsonl, or wev-data .parquet); "
+                         "training mixes all train files, each dev file is scored separately. dir:K repeats that "
+                         "directory's train file K times")
     ap.add_argument("--base", default="Qwen/Qwen3-0.6B-Base")
     ap.add_argument("--base_revision", default=None, help="pin the base model to this Hub revision")
     ap.add_argument("--init_from", default="",
@@ -98,7 +99,8 @@ def main():
     for spec in a.data.split(","):
         path, _, weight = spec.partition(":")
         d, weight = Path(path), int(weight or 1)
-        items, n_drop = load_items(tok, d / "train.jsonl", a.max_state, a.max_branch, a.max_tokens, a.limit or None)
+        items, n_drop = load_items(tok, split_file(d, "train"), a.max_state, a.max_branch, a.max_tokens,
+                                   a.limit or None)
         train += items * weight
         dropped += n_drop
         devs[d.name], _ = load_items(tok, split_file(d, "dev"), a.max_state, a.max_branch, a.max_tokens, a.eval_n)
@@ -188,7 +190,7 @@ def main():
         tmp.rename(ckpt)
         shutil.rmtree(old, ignore_errors=True)
 
-    t0 = time.time()
+    t0, skipped = time.time(), 0
     model.train()
     for ep in range(ep0, a.epochs):
         start = g0 if ep == ep0 else 0
@@ -218,11 +220,17 @@ def main():
                     flat /= world
                     for p, g in zip(params, flat.split([g.numel() for g in grads])):
                         p.grad = g.view_as(p)
-                torch.nn.utils.clip_grad_norm_(params, 1.0)
+                norm = torch.nn.utils.clip_grad_norm_(params, 1.0)
                 consumed = start + (mb + 1) * world   # global batches of this epoch done after this step
                 for group, peak in zip(opt.param_groups, max_lrs):
                     group["lr"] = lr_at((done_before - start + consumed) / total_batches, peak)
-                opt.step()
+                # a non-finite gradient (rare bf16 overflow in the Gated DeltaNet backward) would poison the weights:
+                # skip that update; gradients are averaged first, so every rank skips the same step
+                if torch.isfinite(norm):
+                    opt.step()
+                else:
+                    skipped += 1
+                    log(f"step {step + 1}: non-finite gradient, update skipped ({skipped} so far)", flush=True)
                 opt.zero_grad(set_to_none=True)
                 step += 1
                 if rank == 0 and a.save_every and step % a.save_every == 0:

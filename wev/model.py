@@ -170,6 +170,7 @@ class DecisionModel(nn.Module):
         self.base, self.head_dim, self.device, self.lm_dtype = base, head_dim, device, dtype
         self.head_type, self.keep_layers, self.revision = head, keep_layers, revision
         self._lock = threading.Lock()
+        self.temperature = 1.0   # calibration: serving divides logits by it (fitted on dev rows); argmax is unchanged
         if backbone is not None:
             self.lm = backbone
         else:
@@ -283,7 +284,7 @@ class DecisionModel(nn.Module):
                           else self.forward_rows_batch([e])[0] for e in encs]
             else:
                 logits = self.forward_batch(encs)
-            return [[F.softmax(z, -1).tolist() for z in rec] for rec in logits]
+            return [[F.softmax(z / self.temperature, -1).tolist() for z in rec] for rec in logits]
 
     def trainable_parameters(self):
         return [p for p in self.parameters() if p.requires_grad]

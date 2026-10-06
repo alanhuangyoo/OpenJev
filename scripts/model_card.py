@@ -39,6 +39,11 @@ def main():
     ap.add_argument("--e2e", default="", help="judge-verified end-to-end successes of this model, e.g. 22/153")
     ap.add_argument("--teacher_e2e", default="")
     ap.add_argument("--github", default="https://github.com/alanhuangyoo/wev")
+    ap.add_argument("--init_from", default="", help="Hub repo the adapter was trained from, if not the bare base")
+    ap.add_argument("--glm_teacher_e2e", default="", help="end-to-end successes of the GLM-5.3-Flash teacher")
+    ap.add_argument("--latency", default="", help="one line on measured latency")
+    ap.add_argument("--test_reads", default="For wev-4b and wev-8b, two candidates each were read on test (see the "
+                                            "repository README).")
     a = ap.parse_args()
 
     info = json.loads((Path(a.export) / "wev.json").read_text())
@@ -67,7 +72,7 @@ def main():
 
     card = f"""---
 license: apache-2.0
-base_model: {base}
+base_model: {a.init_from or base}
 language:
 - en
 tags:
@@ -126,8 +131,7 @@ wev serve --model {a.repo} --port 8009   # drop-in POST /v1/systemone, e.g. for 
 ## Results
 
 Test splits, held out from training; every other model was run on the same requests and scored the same way
-(per-question accuracy; `scripts/compare.py`). For wev-4b and wev-8b, two candidates each were read on test (see the
-repository README).
+(per-question accuracy; `scripts/compare.py`). {a.test_reads}
 
 **General typed decisions**
 
@@ -151,7 +155,7 @@ NNetNav test split (live-web steps, DONE judged by an LLM): step success {pct(ac
         card += f"""
 **End to end** (153 held-out tasks on live websites, run by [jev-ultrafast](https://github.com/browser-use/jev-ultrafast)
 with `{name}` as its System One; success = the agent says DONE and an LLM judge reading the final page agrees):
-{a.e2e} tasks{f', vs {a.teacher_e2e} for the qwen3-max teacher behind the same agent' if a.teacher_e2e else ''}.
+{a.e2e} tasks{f', vs {a.teacher_e2e} for the qwen3-max teacher behind the same agent' if a.teacher_e2e else ''}{f' and {a.glm_teacher_e2e} for the GLM-5.3-Flash teacher' if a.glm_teacher_e2e else ''}.
 Live sites differ from run to run; treat gaps of a few tasks as noise.
 """
     card += f"""
@@ -160,14 +164,16 @@ Live sites differ from run to run; treat gaps of a few tasks as noise.
 - Backbone: `{base}` without its vocabulary head, LoRA r={targs['lora']} on every attention and MLP projection, merged
   into the weights of this export; {info['num_layers']} layers, bf16.
 - Readout: a {info['head_type']} head scores each option's `</opt>` state against the question's `<decide>` state.
-- Each question sees the state and itself only (block-causal branches, positions restart after the state), so a
-  request with many questions costs one pass and answers never depend on question order.
+- Each question sees the state and itself only (positions restart after the state), so the state is encoded once
+  per request however many questions it asks, and answers never depend on question order.
+- Probabilities are calibrated: serving divides the logits by a temperature of {info.get('temperature', 1.0)} fitted on
+  development rows, which leaves every answer unchanged.{chr(10) + '- ' + a.latency if a.latency else ''}
 - Context: state up to {info['max_state']} tokens, each question up to {info['max_branch']} tokens (trained with
   {info['train_max_branch']}); longer page states are shrunk before encoding.
 
 ## Training
 
-{targs['epochs']} epoch, lr {targs['lr']}, one-cycle schedule, soft-label cross-entropy where the source has soft labels.
+{targs['epochs']} epoch, lr {targs['lr']}, one-cycle schedule, soft-label cross-entropy where the source has soft labels{f'; the adapter starts from `{a.init_from}`' if a.init_from else ''}.
 Recipe and data builders: [{a.github.split('github.com/')[1]}]({a.github}).
 
 | source | license | what it adds |
@@ -175,6 +181,7 @@ Recipe and data builders: [{a.github.split('github.com/')[1]}]({a.github}).
 | [Mind2Web](https://huggingface.co/datasets/osunlp/Mind2Web) | CC BY 4.0 | human browser steps: click, type, select |
 | [NNetNav-live](https://huggingface.co/datasets/stanfordnlp/nnetnav-live) | Apache-2.0 | live-web steps; DONE relabelled by an LLM judge |
 | teacher episodes | outputs of qwen3-max | jev-ultrafast on live sites with qwen3-max as System One, success judge-verified |
+| GLM teacher episodes | outputs of GLM-5.3-Flash | the same collection with GLM-5.3-Flash as System One, success judge-verified |
 | [kev decision-v7](https://github.com/jaredpalmer/kev) | per source | ten public classification / QA sources plus rule records |
 | [typed-decisions](https://huggingface.co/datasets/LocalLLaMA/typed-decisions) | Apache-2.0 | agent / ops workflows, 5 questions per case (80% of train) |
 | [tasksource-jev](https://huggingface.co/datasets/tasksource/tasksource-jev) | mixed (per source task; some research-only) | hundreds of classification tasks as decisions |
@@ -182,7 +189,7 @@ Recipe and data builders: [{a.github.split('github.com/')[1]}]({a.github}).
 | [typed-decisions-synth](https://huggingface.co/datasets/n4ze3m/typed-decisions-synth) | MIT | multi-question cases over 149 domains |
 
 **Use terms.** Some training data carries its own terms: several tasksource-jev source tasks are research-only, and the
-teacher episodes are qwen3-max outputs subject to its provider's terms. Treat this model as a research artifact and
+teacher episodes are qwen3-max and GLM-5.3-Flash outputs subject to their providers' terms. Treat this model as a research artifact and
 check those terms before any commercial use.
 
 ## Limitations
@@ -209,7 +216,7 @@ Jun Huang and Xin Ren contributed equally (University of Electronic Science and 
 
 ## License
 
-Apache-2.0, like the base model. Architecture code adapted from [kev](https://github.com/jaredpalmer/kev) (Apache-2.0).
+Apache-2.0, like the base model. Architecture code adapted from [kev](https://github.com/jaredpalmer/kev) (Apache-2.0){f'; weights initialised from [{a.init_from}](https://huggingface.co/{a.init_from}) (Apache-2.0)' if a.init_from else ''}.
 """
     (Path(a.export) / "README.md").write_text(card)
     print(card)
