@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>wev: Local System-One Decision Models</title>
+<title>OpenJev (wev): open-source local alternative to Jev</title>
 <meta name="description" content="wev distils LLM browser agents into open, local System-One decision models: typed questions in, calibrated probabilities out, in one forward pass.">
 <style>
   :root {
@@ -72,11 +72,11 @@
     <a class="btn" href="https://zenodo.org/records/22941164">📄 Paper</a>
     <a class="btn" href="https://github.com/alanhuangyoo/wev">💻 Code</a>
     <a class="btn" href="https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6">🤗 Models</a>
-    <a class="btn" href="https://huggingface.co/datasets/alanhuangya/wev-data">🗂️ Dataset</a>
+    <a class="btn" href="https://huggingface.co/datasets/alanhuangya/OpenJev-Data">🗂️ Dataset</a>
     <a class="btn alt" href="https://pypi.org/project/wev-ai/">pip install wev-ai</a>
   </div>
 
-  <p class="tagline"><b>v0.2:</b> wev-4b completes 39–41 of 153 live-website tasks (from 30), with calibrated
+  <p class="tagline"><b>v0.2:</b> OpenJev-4B completes 39–41 of 153 live-website tasks (from 30), with calibrated
   probabilities. A local decision model for agents: typed questions in, calibrated probabilities out, in one forward
   pass. No text generation, no API key.</p>
 
@@ -86,8 +86,8 @@
 
   <div class="stats">
     <div class="stat"><div class="v">79%</div><div class="l">browser steps right on unseen websites (next best open model: 21%)</div></div>
-    <div class="stat"><div class="v">39–41 / 153</div><div class="l">live-website tasks completed by wev-4b v0.2, vs 27 for the qwen3-max teacher</div></div>
-    <div class="stat"><div class="v">10–320 ms</div><div class="l">per decision on one RTX 5090 (wev-4b: 40 ms general, 184 ms browser step)</div></div>
+    <div class="stat"><div class="v">39–41 / 153</div><div class="l">live-website tasks completed by OpenJev-4B v0.2, vs 27 for the qwen3-max teacher</div></div>
+    <div class="stat"><div class="v">10–320 ms</div><div class="l">per decision on one RTX 5090 (OpenJev-4B: 40 ms general, 184 ms browser step)</div></div>
     <div class="stat"><div class="v">36%</div><div class="l">of the teacher's own DONE claims rejected by the judge</div></div>
   </div>
 
@@ -99,7 +99,7 @@
   it while the agent works on live websites produces training data in exactly the decision model's format, and an LLM
   judge reading each episode's final page decides which episodes to keep. We combine this interface distillation with
   Mind2Web and NNetNav demonstrations converted to the same format, after auditing NNetNav's stopping labels, and with
-  general decision corpora. The resulting open models, wev-1.7b, wev-4b and wev-8b, build on Qwen3 base models. wev-4b
+  general decision corpora. The resulting open models, OpenJev-1.7B, OpenJev-4B and OpenJev-8B, build on Qwen3 base models. OpenJev-4B
   answers 76% of browser steps on unseen websites correctly and stays competitive on general decision benchmarks. As
   the System One of an open browser agent, it completes as many held-out live-website tasks as its LLM teacher, at
   15–320 ms per decision on one consumer GPU.</p>
@@ -113,9 +113,9 @@
     <div>
       <table>
         <tr><th>Model</th><th>Browser step</th><th>Transfer</th><th>Typed-dec.</th></tr>
-        <tr class="ours"><td>wev-4b (v0.2)</td><td class="best">78.8</td><td>81.4</td><td>78.8</td></tr>
-        <tr class="ours"><td>wev-8b</td><td>75.5</td><td>77.2</td><td>79.1</td></tr>
-        <tr class="ours"><td>wev-1.7b</td><td>68.2</td><td>65.5</td><td class="best">79.5</td></tr>
+        <tr class="ours"><td>OpenJev-4B (v0.2)</td><td class="best">78.8</td><td>81.4</td><td>78.8</td></tr>
+        <tr class="ours"><td>OpenJev-8B</td><td>75.5</td><td>77.2</td><td>79.1</td></tr>
+        <tr class="ours"><td>OpenJev-1.7B</td><td>68.2</td><td>65.5</td><td class="best">79.5</td></tr>
         <tr><td>Kev-4B</td><td>21.2</td><td class="best">82.1</td><td>65.1</td></tr>
         <tr><td>Kev-8B</td><td>19.0</td><td>76.8</td><td>62.7</td></tr>
         <tr><td>Laya (typed-dec.)</td><td>0.7</td><td>62.8</td><td>76.8</td></tr>
@@ -130,9 +130,9 @@
   <h2>Models</h2>
   <table>
     <tr><th>Model</th><th>Size</th><th>Best for</th><th>General decision</th><th>Browser step</th></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-4b">wev-4b</a> (v0.2)</td><td>8.4 GB</td><td>default; best on live websites</td><td>40 ms</td><td>184 ms</td></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-8b">wev-8b</a></td><td>15.2 GB</td><td>most accurate out of domain</td><td>21 ms</td><td>322 ms</td></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/wev-1.7b">wev-1.7b</a></td><td>3.5 GB</td><td>laptops; the fastest</td><td>10 ms</td><td>91 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-4B">OpenJev-4B</a> (v0.2)</td><td>8.4 GB</td><td>default; best on live websites</td><td>40 ms</td><td>184 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-8B">OpenJev-8B</a></td><td>15.2 GB</td><td>most accurate out of domain</td><td>21 ms</td><td>322 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-1.7B">OpenJev-1.7B</a></td><td>3.5 GB</td><td>laptops; the fastest</td><td>10 ms</td><td>91 ms</td></tr>
   </table>
   <p class="note">Median latency on one RTX 5090 (bf16), one request at a time.</p>
 
@@ -140,7 +140,7 @@
   <div class="copy-wrap"><button class="copy" data-target="qs">Copy</button><pre id="qs">pip install "wev-ai[serve]"
 
 import wev
-m = wev.load("alanhuangya/wev-4b")
+m = wev.load("alanhuangya/OpenJev-4B")
 out = m.predict(
     state="Refund request: order #4411 arrived damaged, customer attached photos.",
     questions={"action": {"type": "choice", "instructions": "What should support do?",
@@ -149,7 +149,7 @@ out = m.predict(
 )
 
 # or serve a drop-in POST /v1/systemone endpoint
-wev serve --model alanhuangya/wev-4b --port 8009</pre></div>
+wev serve --model alanhuangya/OpenJev-4B --port 8009</pre></div>
 
   <h2>Citation</h2>
   <div class="copy-wrap"><button class="copy" data-target="bib">Copy</button><pre id="bib">@misc{huang2026wev,

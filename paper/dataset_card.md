@@ -62,8 +62,8 @@ operation and target element. Every row is one browser step, written as a `POST 
 state plus typed questions) with its labelled answers. The requests use exactly the format the open browser agent
 [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) sends to its System One, so a model trained or scored
 here can be served behind that agent unchanged. The data trains the [wev](https://github.com/alanhuangyoo/wev) models
-([wev-1.7b](https://huggingface.co/alanhuangya/wev-1.7b), [wev-4b](https://huggingface.co/alanhuangya/wev-4b),
-[wev-8b](https://huggingface.co/alanhuangya/wev-8b)), and the `bench` config is a frozen test set, **wev-bench**, that
+([wev-1.7b](https://huggingface.co/alanhuangya/OpenJev-1.7B), [wev-4b](https://huggingface.co/alanhuangya/OpenJev-4B),
+[wev-8b](https://huggingface.co/alanhuangya/OpenJev-8B)), and the `bench` config is a frozen test set, **wev-bench**, that
 scores any System One endpoint.
 
 ## Load it
@@ -73,14 +73,14 @@ Every config is parquet and loads with one call:
 ```python
 from datasets import load_dataset
 
-m2w      = load_dataset("alanhuangya/wev-data", "mind2web")          # human steps, split by website
-nnetnav  = load_dataset("alanhuangya/wev-data", "nnetnav_audited")   # live-web steps with audited DONE labels
-webchain = load_dataset("alanhuangya/wev-data", "webchain")          # human steps on 200+ live sites
-qwen     = load_dataset("alanhuangya/wev-data", "teacher_qwen3max")  # qwen3-max acting as System One
-glm      = load_dataset("alanhuangya/wev-data", "teacher_glm")       # GLM-5.3-Flash acting as System One
-onpolicy = load_dataset("alanhuangya/wev-data", "onpolicy_glm")      # student-visited states, GLM labels
-tasks    = load_dataset("alanhuangya/wev-data", "live_tasks")        # goals + start URLs; test = 153 held-out tasks
-bench    = load_dataset("alanhuangya/wev-data", "bench", split="test")  # wev-bench, frozen
+m2w      = load_dataset("alanhuangya/OpenJev-Data", "mind2web")          # human steps, split by website
+nnetnav  = load_dataset("alanhuangya/OpenJev-Data", "nnetnav_audited")   # live-web steps with audited DONE labels
+webchain = load_dataset("alanhuangya/OpenJev-Data", "webchain")          # human steps on 200+ live sites
+qwen     = load_dataset("alanhuangya/OpenJev-Data", "teacher_qwen3max")  # qwen3-max acting as System One
+glm      = load_dataset("alanhuangya/OpenJev-Data", "teacher_glm")       # GLM-5.3-Flash acting as System One
+onpolicy = load_dataset("alanhuangya/OpenJev-Data", "onpolicy_glm")      # student-visited states, GLM labels
+tasks    = load_dataset("alanhuangya/OpenJev-Data", "live_tasks")        # goals + start URLs; test = 153 held-out tasks
+bench    = load_dataset("alanhuangya/OpenJev-Data", "bench", split="test")  # wev-bench, frozen
 ```
 
 ## Configs
@@ -228,7 +228,7 @@ answer without a distribution is scored as one-hot and flagged.
 **Run it** against any endpoint that speaks `POST /v1/systemone`:
 
 ```bash
-wev serve --model alanhuangya/wev-4b --port 8009        # or any System One server
+wev serve --model alanhuangya/OpenJev-4B --port 8009        # or any System One server
 python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name my-model \
   --hardware "RTX 5090, bf16" --out results/wev-bench/my-model.json
 ```

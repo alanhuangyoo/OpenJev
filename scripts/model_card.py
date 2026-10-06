@@ -1,6 +1,6 @@
 """Write the Hugging Face model card (README.md) for an exported wev model from result files.
 
-    python scripts/model_card.py --export exports/wev-4b --repo alanhuangya/wev-4b --locked locked/wev-4b \
+    python scripts/model_card.py --export exports/wev-4b --repo alanhuangya/OpenJev-4B --locked locked/wev-4b \
         --baselines results/baselines --e2e "22/153" --teacher_e2e "27/153"
 
 Every number comes from a result JSON: --locked holds this model's single test read (wev evaluate), --baselines the

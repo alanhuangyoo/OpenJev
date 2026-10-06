@@ -1,7 +1,7 @@
 """Load a model and answer System One requests in-process.
 
     import wev
-    m = wev.load("alanhuangya/wev-4b")           # exported model dir, Hub repo, or a training run dir
+    m = wev.load("alanhuangya/OpenJev-4B")           # exported model dir, Hub repo, or a training run dir
     out = m.predict(state, questions)                    # {"answers": ..., "usage": ..., "latency_ms": ...}
 
 Two on-disk formats are understood:

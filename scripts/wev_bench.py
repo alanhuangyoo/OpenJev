@@ -1,6 +1,6 @@
 """wev-bench: score any POST /v1/systemone endpoint on the frozen browser-step test set (wev-data config `bench`).
 
-    wev serve --model alanhuangya/wev-4b --port 8009
+    wev serve --model alanhuangya/OpenJev-4B --port 8009
     python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name wev-4b \
         --out results/wev-bench/wev-4b.json
 
@@ -24,7 +24,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-REPO = "alanhuangya/wev-data"
+REPO = "alanhuangya/OpenJev-Data"
 BENCH_FILE = "bench/test.parquet"
 VERSION = "1.0"
 SUM_TOL = 0.02

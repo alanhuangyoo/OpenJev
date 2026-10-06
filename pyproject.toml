@@ -1,11 +1,11 @@
 [project]
 name = "wev-ai"
-version = "0.2.0"
-description = "Local System-One decision model: typed questions in, calibrated probabilities out, one forward pass. General decisions and browser-agent steps; drop-in POST /v1/systemone."
+version = "0.2.1"
+description = "OpenJev: open-source, local alternative to Jev. Local System-One decision model: typed questions in, calibrated probabilities out, one forward pass. General decisions and browser-agent steps; drop-in POST /v1/systemone."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.11,<3.14"
-keywords = ["decision-model", "system-one", "browser-agent", "llm", "lora", "qwen", "calibration"]
+keywords = ["jev", "jev-alternative", "openjev", "decision-model", "system-one", "browser-agent", "llm", "lora", "qwen", "calibration"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",

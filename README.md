@@ -2,11 +2,12 @@
 
 # wev
 
+**OpenJev: the open-source, local alternative to Jev.** Models on the Hub as `OpenJev-1.7B / 4B / 8B`.<br>
 **Local System-One decision models for agents.**<br>
 Typed questions in, calibrated probabilities out, in one forward pass. No text generation, no API key.
 
 [![Models](https://img.shields.io/badge/%F0%9F%A4%97%20Models-1.7B%20%7C%204B%20%7C%208B-ffcc4d)](https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6)
-[![Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-wev--data-ffcc4d)](https://huggingface.co/datasets/alanhuangya/wev-data)
+[![Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-OpenJev--Data-ffcc4d)](https://huggingface.co/datasets/alanhuangya/OpenJev-Data)
 [![pip](https://img.shields.io/badge/pip%20install-wev--ai-3775a9?logo=pypi&logoColor=white)](https://pypi.org/project/wev-ai/)
 [![Project page](https://img.shields.io/badge/%F0%9F%A4%97%20Project-page-ffcc4d)](https://huggingface.co/spaces/alanhuangya/wev)
 [![Paper](https://img.shields.io/badge/Paper-Zenodo-b31b1b)](https://zenodo.org/records/22941164)
@@ -26,17 +27,17 @@ Typed questions in, calibrated probabilities out, in one forward pass. No text g
 agent monitoring, and it handles browser-agent steps: *which operation?* and *which element?* It runs on your own
 GPU, or on a laptop.
 
-**New in v0.2 (wev-4b):** live-website tasks completed rise from 30 to 39–41 of 153, out-of-domain general accuracy
+**New in v0.2 (OpenJev-4B):** live-website tasks completed rise from 30 to 39–41 of 153, out-of-domain general accuracy
 from 73.8 to 81.4, and browser steps on unseen websites from 75.9 to 78.8; probabilities are calibrated (ECE 0.01–0.04)
-and a browser step takes 184 ms. wev-8b and wev-1.7b are still v0.1.
+and a browser step takes 184 ms. OpenJev-8B and OpenJev-1.7B are still v0.1.
 
 ## Highlights
 
 - 🌐 **Browser steps on unseen websites: 79% right**, where open decision models trained on general data reach at
   most 21%.
-- 🧠 **General decisions stay strong.** wev-4b scores 88.1 on Kev decision-v7 and 81.4 out of domain, and wev beats
+- 🧠 **General decisions stay strong.** OpenJev-4B scores 88.1 on Kev decision-v7 and 81.4 out of domain, and wev beats
   Laya on every general benchmark.
-- 🎓 **Better than its teacher, locally.** As the System One of an open browser agent, wev-4b completes 39–41 of 153
+- 🎓 **Better than its teacher, locally.** As the System One of an open browser agent, OpenJev-4B completes 39–41 of 153
   held-out live tasks, against 27 for the qwen3-max teacher.
 - ⚡ **Fast.** 10–40 ms for a general decision and 91–322 ms for a full browser page on one RTX 5090; 77 ms on a
   laptop.
@@ -46,12 +47,12 @@ and a browser step takes 184 ms. wev-8b and wev-1.7b are still v0.1.
 
 | Model | Size | Best for | General decision | Browser step |
 |---|---|---|---|---|
-| [**wev-4b**](https://huggingface.co/alanhuangya/wev-4b) (v0.2) | 8.4 GB | the default: one consumer GPU, best on live websites and out of domain | 40 ms | 184 ms |
-| [wev-8b](https://huggingface.co/alanhuangya/wev-8b) (v0.1) | 15.2 GB | a larger v0.1 model | 21 ms | 322 ms |
-| [wev-1.7b](https://huggingface.co/alanhuangya/wev-1.7b) (v0.1) | 3.5 GB | laptops and small GPUs; the fastest | 10 ms | 91 ms |
+| [**OpenJev-4B**](https://huggingface.co/alanhuangya/OpenJev-4B) (v0.2) | 8.4 GB | the default: one consumer GPU, best on live websites and out of domain | 40 ms | 184 ms |
+| [OpenJev-8B](https://huggingface.co/alanhuangya/OpenJev-8B) (v0.1) | 15.2 GB | a larger v0.1 model | 21 ms | 322 ms |
+| [OpenJev-1.7B](https://huggingface.co/alanhuangya/OpenJev-1.7B) (v0.1) | 3.5 GB | laptops and small GPUs; the fastest | 10 ms | 91 ms |
 
-*Median latency on one RTX 5090 (bf16), one request at a time. wev-4b v0.1 stays available as the `v0.1` revision:
-`wev.load("alanhuangya/wev-4b", revision="v0.1")`. wev-4b v0.2 runs on a Qwen3.5 backbone and needs transformers 5;
+*Median latency on one RTX 5090 (bf16), one request at a time. OpenJev-4B v0.1 stays available as the `v0.1` revision:
+`wev.load("alanhuangya/OpenJev-4B", revision="v0.1")`. OpenJev-4B v0.2 runs on a Qwen3.5 backbone and needs transformers 5;
 `pip install "wev-ai[serve,fast]"` adds its fast kernels on CUDA.*
 
 ## Quickstart
@@ -63,7 +64,7 @@ pip install "wev-ai[serve]"
 ```python
 import wev
 
-m = wev.load("alanhuangya/wev-4b")   # downloads once from the Hugging Face Hub
+m = wev.load("alanhuangya/OpenJev-4B")   # downloads once from the Hugging Face Hub
 out = m.predict(
     state="Refund request: order #4411 arrived damaged, customer attached photos, first refund this year.",
     questions={
@@ -82,7 +83,7 @@ out["answers"]
 **Serve it over HTTP** with the same request and response shapes as a System One API:
 
 ```bash
-wev serve --model alanhuangya/wev-4b --port 8009
+wev serve --model alanhuangya/OpenJev-4B --port 8009
 curl -s localhost:8009/v1/systemone -H 'content-type: application/json' -d '{"state": "...", "questions": {...}}'
 ```
 
@@ -102,9 +103,9 @@ most probable option taken as its answer. All numbers are on held-out test split
 
 | Model | Kev decision-v7 | Kev transfer-v4 | typed-decisions |
 |---|:---:|:---:|:---:|
-| **wev-4b** (v0.2) | 88.1 | 81.4 | 78.8 |
-| **wev-8b** | 82.4 | 77.2 | 79.1 |
-| **wev-1.7b** | 81.1 | 65.5 | **79.5** |
+| **OpenJev-4B** (v0.2) | 88.1 | 81.4 | 78.8 |
+| **OpenJev-8B** | 82.4 | 77.2 | 79.1 |
+| **OpenJev-1.7B** | 81.1 | 65.5 | **79.5** |
 | Kev-4B | **88.2** | **82.1** | 65.1 |
 | Kev-8B | 88.1 | 76.8 | 62.7 |
 | Laya (typed-decisions) | 65.7 | 62.8 | 76.8 |
@@ -115,9 +116,9 @@ operation and the target element are right.
 
 | Model | Step success | Operation |
 |---|:---:|:---:|
-| **wev-4b** (v0.2) | **78.8** | **92.0** |
-| **wev-8b** | 75.5 | 90.3 |
-| **wev-1.7b** | 68.2 | 88.1 |
+| **OpenJev-4B** (v0.2) | **78.8** | **92.0** |
+| **OpenJev-8B** | 75.5 | 90.3 |
+| **OpenJev-1.7B** | 68.2 | 88.1 |
 | Kev-4B | 21.2 | 35.7 |
 | Kev-8B | 19.0 | 73.3 |
 | Laya (typed-decisions) | 0.7 | 13.1 |
@@ -128,9 +129,9 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 
 | System One | Tasks completed |
 |---|:---:|
-| wev-4b (v0.2) | 39–41 / 153 |
-| wev-4b (v0.1) | 30–31 / 153 |
-| wev-8b | 28 / 153 |
+| OpenJev-4B (v0.2) | 39–41 / 153 |
+| OpenJev-4B (v0.1) | 30–31 / 153 |
+| OpenJev-8B | 28 / 153 |
 | qwen3-max, prompted (teacher of v0.1) | 27 / 153 |
 | GLM-5.3-Flash, prompted (teacher added in v0.2) | 47 / 153 |
 
@@ -145,12 +146,12 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
   that column they are generalists.
 - Kev and Laya ran as published, without web training data. wev is evaluated with a 4,096-token state; the 11
   Mind2Web requests beyond it count as wrong for wev.
-- Live sites change from run to run, so treat end-to-end gaps of a few tasks as noise. wev-4b's gain from its second
+- Live sites change from run to run, so treat end-to-end gaps of a few tasks as noise. OpenJev-4B's gain from its second
   teacher collection held on a paired comparison (10 tasks gained, 1 lost).
-- Test splits were held out from training and model selection, with one exception: wev-4b v0.1 and wev-8b each had
-  two candidates, and both were read on test. wev-4b v0.2 was read on test once (and its calibrated export once more;
+- Test splits were held out from training and model selection, with one exception: OpenJev-4B v0.1 and OpenJev-8B each had
+  two candidates, and both were read on test. OpenJev-4B v0.2 was read on test once (and its calibrated export once more;
   the calibration is fitted on development rows and changes no answer).
-- wev-4b v0.2 continues training from the Kev-4B checkpoint (Apache-2.0); see its model card.
+- OpenJev-4B v0.2 continues training from the Kev-4B checkpoint (Apache-2.0); see its model card.
 - Raw results are in [`results/`](https://github.com/alanhuangyoo/wev/tree/main/results).
 
 </details>
@@ -161,8 +162,8 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 <p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/wev/main/assets/stopping.png" width="55%" alt="DONE recall against premature DONE rate as the threshold on the DONE probability is swept."></p>
 
 The hardest browser decision is when to stop. Accepting DONE only above a probability threshold trades missed stops
-for early ones: at 0.8, wev-4b v0.1 stops early on 3.8% of unfinished steps (8.5% at 0.5), and wev-8b on 1.7%.
-wev-4b v0.2 stops early on 3.3% of wev-bench's unfinished steps at its default argmax.
+for early ones: at 0.8, OpenJev-4B v0.1 stops early on 3.8% of unfinished steps (8.5% at 0.5), and OpenJev-8B on 1.7%.
+OpenJev-4B v0.2 stops early on 3.3% of wev-bench's unfinished steps at its default argmax.
 
 </details>
 
@@ -170,13 +171,13 @@ wev-4b v0.2 stops early on 3.3% of wev-bench's unfinished steps at its default a
 
 A frozen browser lane for decision models: 2,346 steps (Mind2Web test on unseen websites, audited NNetNav test with
 its stopping and giving-up steps, and teacher steps on tasks in no train split), stored as the `bench` config of
-[`alanhuangya/wev-data`](https://huggingface.co/datasets/alanhuangya/wev-data). `scripts/wev_bench.py` sends each
+[`alanhuangya/OpenJev-Data`](https://huggingface.co/datasets/alanhuangya/OpenJev-Data). `scripts/wev_bench.py` sends each
 stored request to any `POST /v1/systemone` endpoint and reports step success, operation and target accuracy, the
 premature-DONE rate, ECE and p50/p95 latency, overall and per subset. It needs only the standard library and
 `pyarrow`.
 
 ```bash
-wev serve --model alanhuangya/wev-4b --port 8009          # or any System One server
+wev serve --model alanhuangya/OpenJev-4B --port 8009          # or any System One server
 python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name wev-4b \
   --hardware "RTX 5090, bf16" --out results/wev-bench/wev-4b-v0.2.json
 ```
@@ -189,8 +190,8 @@ per-system layout with a `browser` lane block, so it can be submitted to a JevBe
 
 | System One | Step success | Operation | Target | Premature DONE | ECE | p50 / p95 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **wev-4b v0.2** | **73.1** | **84.7** | **81.4** | **3.3** | **0.013** | **153 / 353 ms** |
-| wev-4b v0.1 | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
+| **OpenJev-4B v0.2** | **73.1** | **84.7** | **81.4** | **3.3** | **0.013** | **153 / 353 ms** |
+| OpenJev-4B v0.1 | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
 
 One RTX 5090 (bf16), queried serially from the same host;
 [`results/wev-bench/`](https://github.com/alanhuangyoo/wev/tree/main/results/wev-bench) has the full results.
@@ -262,7 +263,7 @@ python scripts/scan_pii.py --data hf/wev-data --out hf/pii-report.json
 ```
 
 The converted browser data and the teacher collections are on the Hub as
-[`alanhuangya/wev-data`](https://huggingface.co/datasets/alanhuangya/wev-data); a downloaded config folder can be
+[`alanhuangya/OpenJev-Data`](https://huggingface.co/datasets/alanhuangya/OpenJev-Data); a downloaded config folder can be
 passed to `--data` as is (JSONL or parquet, `validation` is read as the development split). To collect new teacher
 episodes, use `scripts/teacher_server.py`, `make_tasks.py`, `collect.py` and `build_teacher_data.py`; for on-policy
 rows, `scripts/dagger_server.py` and `build_teacher_data.py --onpolicy`.
@@ -295,7 +296,7 @@ subject to its provider's terms. Treat the models as research artifacts and chec
   text model.
 - Browser targets are scored among the candidates the agent lists (8–40 per step), not every element on the page, so
   the numbers are not comparable to the Mind2Web leaderboard.
-- Rare operations are rarely predicted: BLOCKED and scrolling have low recall. On NNetNav, wev-4b says DONE too early
+- Rare operations are rarely predicted: BLOCKED and scrolling have low recall. On NNetNav, OpenJev-4B says DONE too early
   on 8–10% of steps unless you threshold it.
 - On Kev's own suite, Kev is more accurate.
 - wev has not been compared with Jev itself, because we have no API access.
