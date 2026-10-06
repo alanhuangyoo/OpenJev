@@ -1,14 +1,14 @@
 <div align="center">
 
-# wev
+# OpenJev
 
-**OpenJev: the open-source, local alternative to Jev.** Models on the Hub as `OpenJev-1.7B / 4B / 8B`.<br>
-**Local System-One decision models for agents.**<br>
-Typed questions in, calibrated probabilities out, in one forward pass. No text generation, no API key.
+**The open-source, local alternative to Jev: System-One decision models for agents.**<br>
+Typed questions in, calibrated probabilities out, in one forward pass. No text generation, no API key.<br>
+<sub>Python package `wev-ai` (`import wev`) · models `OpenJev-1.7B / 4B / 8B` on the Hugging Face Hub</sub>
 
-[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20Models-1.7B%20%7C%204B%20%7C%208B-ffcc4d)](https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6)
+[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20OpenJev-1.7B%20%7C%204B%20%7C%208B-ffcc4d)](https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6)
 [![Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-OpenJev--Data-ffcc4d)](https://huggingface.co/datasets/alanhuangya/OpenJev-Data)
-[![pip](https://img.shields.io/badge/pip%20install-wev--ai-3775a9?logo=pypi&logoColor=white)](https://pypi.org/project/wev-ai/)
+[![pip](https://img.shields.io/badge/pip%20install-openjev--ai-3775a9?logo=pypi&logoColor=white)](https://pypi.org/project/openjev-ai/)
 [![Project page](https://img.shields.io/badge/%F0%9F%A4%97%20Project-page-ffcc4d)](https://huggingface.co/spaces/alanhuangya/wev)
 [![Paper](https://img.shields.io/badge/Paper-Zenodo-b31b1b)](https://zenodo.org/records/22941164)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22941164.svg)](https://zenodo.org/records/22941164)
