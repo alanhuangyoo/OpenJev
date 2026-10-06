@@ -1,6 +1,6 @@
 [project]
 name = "wev-ai"
-version = "0.2.1"
+version = "0.2.2"
 description = "OpenJev: open-source, local alternative to Jev. Local System-One decision model: typed questions in, calibrated probabilities out, one forward pass. General decisions and browser-agent steps; drop-in POST /v1/systemone."
 readme = "README.md"
 license = "Apache-2.0"
@@ -32,9 +32,9 @@ train = ["datasets>=3.0", "lxml>=5", "cssselect", "pyarrow"]   # data converters
 dev = ["pytest", "datasets>=3.0", "lxml>=5", "cssselect"]
 
 [project.urls]
-Homepage = "https://github.com/alanhuangyoo/wev"
+Homepage = "https://github.com/alanhuangyoo/OpenJev"
 Models = "https://huggingface.co/alanhuangya"
-Issues = "https://github.com/alanhuangyoo/wev/issues"
+Issues = "https://github.com/alanhuangyoo/OpenJev/issues"
 
 [build-system]
 requires = ["setuptools>=68"]

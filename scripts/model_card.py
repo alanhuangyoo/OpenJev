@@ -38,7 +38,7 @@ def main():
     ap.add_argument("--baselines", required=True)
     ap.add_argument("--e2e", default="", help="judge-verified end-to-end successes of this model, e.g. 22/153")
     ap.add_argument("--teacher_e2e", default="")
-    ap.add_argument("--github", default="https://github.com/alanhuangyoo/wev")
+    ap.add_argument("--github", default="https://github.com/alanhuangyoo/OpenJev")
     ap.add_argument("--init_from", default="", help="Hub repo the adapter was trained from, if not the bare base")
     ap.add_argument("--glm_teacher_e2e", default="", help="end-to-end successes of the GLM-5.3-Flash teacher")
     ap.add_argument("--latency", default="", help="one line on measured latency")

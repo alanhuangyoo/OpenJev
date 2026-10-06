@@ -12,14 +12,14 @@ Typed questions in, calibrated probabilities out, in one forward pass. No text g
 [![Project page](https://img.shields.io/badge/%F0%9F%A4%97%20Project-page-ffcc4d)](https://huggingface.co/spaces/alanhuangya/wev)
 [![Paper](https://img.shields.io/badge/Paper-Zenodo-b31b1b)](https://zenodo.org/records/22941164)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22941164.svg)](https://zenodo.org/records/22941164)
-[![License](https://img.shields.io/badge/License-Apache--2.0-2ea44f)](https://github.com/alanhuangyoo/wev/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache--2.0-2ea44f)](https://github.com/alanhuangyoo/OpenJev/blob/main/LICENSE)
 
 [Quickstart](#quickstart) · [Results](#results) · [How it works](#how-it-works) · [Train your own](#train-your-own) · [Citation](#citation)
 
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/alanhuangyoo/wev/main/assets/overview.png" width="88%" alt="Interface distillation: a browser agent's typed requests are answered by a teacher LLM on live websites, an LLM judge keeps the verified episodes, and the wev decision model trained on them serves the same interface locally.">
+  <img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/overview.png" width="88%" alt="Interface distillation: a browser agent's typed requests are answered by a teacher LLM on live websites, an LLM judge keeps the verified episodes, and the wev decision model trained on them serves the same interface locally.">
 </p>
 
 `wev` answers the `POST /v1/systemone` request shape: a free-form state plus any number of questions, each a
@@ -94,7 +94,7 @@ change that one line.
 
 ## Results
 
-<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/wev/main/assets/teaser.png" width="52%" alt="Browser step success against out-of-domain general accuracy for wev, Kev and Laya."></p>
+<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/teaser.png" width="52%" alt="Browser step success against out-of-domain general accuracy for wev, Kev and Laya."></p>
 
 Every model below receives the same requests and is scored the same way: per-question accuracy, with each model's
 most probable option taken as its answer. All numbers are on held-out test splits.
@@ -152,14 +152,14 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
   two candidates, and both were read on test. OpenJev-4B v0.2 was read on test once (and its calibrated export once more;
   the calibration is fitted on development rows and changes no answer).
 - OpenJev-4B v0.2 continues training from the Kev-4B checkpoint (Apache-2.0); see its model card.
-- Raw results are in [`results/`](https://github.com/alanhuangyoo/wev/tree/main/results).
+- Raw results are in [`results/`](https://github.com/alanhuangyoo/OpenJev/tree/main/results).
 
 </details>
 
 <details>
 <summary><b>Calibration: choosing when to stop</b></summary>
 
-<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/wev/main/assets/stopping.png" width="55%" alt="DONE recall against premature DONE rate as the threshold on the DONE probability is swept."></p>
+<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/stopping.png" width="55%" alt="DONE recall against premature DONE rate as the threshold on the DONE probability is swept."></p>
 
 The hardest browser decision is when to stop. Accepting DONE only above a probability threshold trades missed stops
 for early ones: at 0.8, OpenJev-4B v0.1 stops early on 3.8% of unfinished steps (8.5% at 0.5), and OpenJev-8B on 1.7%.
@@ -194,7 +194,7 @@ per-system layout with a `browser` lane block, so it can be submitted to a JevBe
 | OpenJev-4B v0.1 | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
 
 One RTX 5090 (bf16), queried serially from the same host;
-[`results/wev-bench/`](https://github.com/alanhuangyoo/wev/tree/main/results/wev-bench) has the full results.
+[`results/wev-bench/`](https://github.com/alanhuangyoo/OpenJev/tree/main/results/wev-bench) has the full results.
 
 ## How it works
 
@@ -321,4 +321,4 @@ Jun Huang and Xin Ren contributed equally (University of Electronic Science and 
 Apache-2.0. The model code builds on [kev](https://github.com/jaredpalmer/kev) (Apache-2.0) and uses instruction text
 from [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) (MIT); the models build on Qwen3 base models
 (Apache-2.0). wev is an independent project, not affiliated with TypeSafe AI, and does not use Jev. See
-[NOTICE](https://github.com/alanhuangyoo/wev/blob/main/NOTICE).
+[NOTICE](https://github.com/alanhuangyoo/OpenJev/blob/main/NOTICE).

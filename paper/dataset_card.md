@@ -61,7 +61,7 @@ Browser-step data and a benchmark for **decision models**: the small, fast model
 operation and target element. Every row is one browser step, written as a `POST /v1/systemone` request (the page
 state plus typed questions) with its labelled answers. The requests use exactly the format the open browser agent
 [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) sends to its System One, so a model trained or scored
-here can be served behind that agent unchanged. The data trains the [wev](https://github.com/alanhuangyoo/wev) models
+here can be served behind that agent unchanged. The data trains the [wev](https://github.com/alanhuangyoo/OpenJev) models
 ([wev-1.7b](https://huggingface.co/alanhuangya/OpenJev-1.7B), [wev-4b](https://huggingface.co/alanhuangya/OpenJev-4B),
 [wev-8b](https://huggingface.co/alanhuangya/OpenJev-8B)), and the `bench` config is a frozen test set, **wev-bench**, that
 scores any System One endpoint.
@@ -233,7 +233,7 @@ python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name my-m
   --hardware "RTX 5090, bf16" --out results/wev-bench/my-model.json
 ```
 
-The script is in the [wev repository](https://github.com/alanhuangyoo/wev/blob/main/scripts/wev_bench.py) and needs
+The script is in the [wev repository](https://github.com/alanhuangyoo/OpenJev/blob/main/scripts/wev_bench.py) and needs
 only the Python standard library and `pyarrow`. The result is a JSON file in JevBench's per-system layout (`key`,
 `display`, `open`, `licence`, `has_distribution`, a `browser` lane block with `by_family`, `speed_block`, ...), plus
 the dataset revision and the bench file's sha256, so it can be submitted to a leaderboard as is.
