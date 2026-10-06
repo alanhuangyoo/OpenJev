@@ -77,8 +77,8 @@ def _load_exported(root: Path, device: str, dtype):
 class WebDecide:
     def __init__(self, tok, model, meta, name: str):
         self.tokenizer, self.model, self.meta, self.name = tok, model, meta, name
-        self.max_state = meta.get("max_state", MAX_STATE)
-        self.max_branch = meta.get("max_branch", MAX_BRANCH)
+        self.max_state = meta.get("max_state") or MAX_STATE   # runs saved mid-training (checkpoints) record none
+        self.max_branch = meta.get("max_branch") or MAX_BRANCH
 
     def encode(self, req: SystemOneRequest):
         """Encode; when the state is too long for the context, shrink it in this order and retry:

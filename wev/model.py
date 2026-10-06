@@ -27,6 +27,7 @@ LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", 
 # Gated DeltaNet projections of hybrid backbones (Qwen3.5), adapted too
 HYBRID_TARGETS = ["in_proj_qkv", "in_proj_z", "in_proj_a", "in_proj_b", "out_proj"]
 MAX_STATE, MAX_BRANCH = 4096, 2048
+PREFIX_MIN_SAVED = 512   # hybrid serving: repeated state tokens above which running the state once wins (measured on a 5090)
 
 
 class ContextTooLong(ValueError):
@@ -244,12 +245,45 @@ class DecisionModel(nn.Module):
                         for d, oi in zip(e["decide_idx"], e["opt_idx"])])
         return out
 
+    def forward_prefix(self, enc: dict) -> list[torch.Tensor]:
+        """Row form with the state run once: the state's cache (KV, plus recurrent and conv states on hybrid layers) is
+        copied to every question, and only the question branches run as a batch. Same logits as forward_rows_batch."""
+        from transformers import DynamicCache
+        s_ids, s_pos, branches = rows_of(enc)
+        q = len(branches)
+        with self._autocast():
+            cache = self.lm(input_ids=torch.tensor([s_ids], device=self.device),
+                            position_ids=torch.tensor([s_pos], device=self.device),
+                            past_key_values=DynamicCache(config=self.lm.config), use_cache=True).past_key_values
+            if q > 1:
+                cache.reorder_cache(torch.zeros(q, dtype=torch.long, device=self.device))
+            n = max(len(r["ids"]) for r in branches)
+            ids = torch.full((q, n), self.pad_id, dtype=torch.long, device=self.device)
+            pos = torch.zeros((q, n), dtype=torch.long, device=self.device)
+            att = torch.zeros((q, len(s_ids) + n), dtype=torch.long, device=self.device)
+            att[:, : len(s_ids)] = 1
+            for i, r in enumerate(branches):
+                ids[i, : len(r["ids"])] = torch.tensor(r["ids"], device=self.device)
+                pos[i, : len(r["pos"])] = torch.tensor(r["pos"], device=self.device)
+                att[i, len(s_ids): len(s_ids) + len(r["ids"])] = 1
+            h = self.lm(input_ids=ids, position_ids=pos, attention_mask=att, past_key_values=cache,
+                        use_cache=True).last_hidden_state.float()
+        return [self.head(h[i, r["decide"]], h[i, torch.tensor(r["opts"], device=self.device)])
+                for i, r in enumerate(branches)]
+
     @torch.no_grad()
     def probs(self, encs: list[dict]) -> list[list[list[float]]]:
         # one forward at a time: the GPU serialises them anyway, and the Triton autotuner behind the Gated DeltaNet
         # kernels of hybrid backbones is not thread-safe (concurrent server requests crash it)
         with self._lock:
-            return [[F.softmax(z, -1).tolist() for z in rec] for rec in self.forward_batch(encs)]
+            if self.hybrid:
+                # rows recompute the state per question; past PREFIX_MIN_SAVED repeated state tokens, running the state once and
+                # copying its cache is cheaper (browser steps), below it the second pass costs more (short states)
+                logits = [self.forward_prefix(e) if (len(e["decide_idx"]) - 1) * e["seg"].count(0) > PREFIX_MIN_SAVED
+                          else self.forward_rows_batch([e])[0] for e in encs]
+            else:
+                logits = self.forward_batch(encs)
+            return [[F.softmax(z, -1).tolist() for z in rec] for rec in logits]
 
     def trainable_parameters(self):
         return [p for p in self.parameters() if p.requires_grad]
