@@ -1,4 +1,4 @@
-"""Write the Hugging Face model card (README.md) for an exported wev model from result files.
+"""Write the Hugging Face model card (README.md) for an exported OpenJev model from result files.
 
     python scripts/model_card.py --export exports/wev-4b --repo alanhuangya/OpenJev-4B --locked locked/wev-4b \
         --baselines results/baselines --e2e "22/153" --teacher_e2e "27/153"
@@ -42,12 +42,13 @@ def main():
     ap.add_argument("--init_from", default="", help="Hub repo the adapter was trained from, if not the bare base")
     ap.add_argument("--glm_teacher_e2e", default="", help="end-to-end successes of the GLM-5.3-Flash teacher")
     ap.add_argument("--latency", default="", help="one line on measured latency")
-    ap.add_argument("--test_reads", default="For wev-4b and wev-8b, two candidates each were read on test (see the "
+    ap.add_argument("--test_reads", default="For OpenJev-4B and OpenJev-8B, two candidates each were read on test (see the "
                                             "repository README).")
     a = ap.parse_args()
 
     info = json.loads((Path(a.export) / "wev.json").read_text())
-    name, base, targs = info["name"], info["base"], info["train_args"]
+    base, targs = info["base"], info["train_args"]
+    name = a.repo.split("/")[-1]   # the Hub name, e.g. OpenJev-4B
     locked, bdir = Path(a.locked), Path(a.baselines)
     ours = {b: read(locked / f"{b}.json") for b, _ in GENERAL + [("m2w-v2", ""), ("nnetnav-v3-clean", "")]}
 
@@ -93,7 +94,7 @@ datasets:
 
 **Jun Huang\\*, Xin Ren\\*** · University of Electronic Science and Technology of China · \\*Equal contribution
 
-**A local decision model: typed questions in, calibrated probabilities out, in one forward pass.** `{name}` answers
+**A local decision model: typed questions in, calibrated probabilities out, in one forward pass.** {name} answers
 the `POST /v1/systemone` request shape (choice, yes/no and score questions over a free-form state), for general
 decisions and for browser-agent steps (*which operation? which element?*). It runs on your own GPU: no API key,
 no per-call cost, nothing generated.
@@ -137,8 +138,8 @@ Test splits, held out from training; every other model was run on the same reque
 
 {general}
 
-`{name}` trains on 80% of the typed-decisions train split, like the Laya (typed-decisions) specialist; Kev and Laya
-do not, so on that column they are generalists. kev decision-v7 is Kev's own training suite (`{name}` also trains on
+{name} trains on 80% of the typed-decisions train split, like the Laya (typed-decisions) specialist; Kev and Laya
+do not, so on that column they are generalists. kev decision-v7 is Kev's own training suite ({name} also trains on
 its train split); transfer-v4 is out-of-domain for every model here.
 
 **Browser steps** (Mind2Web test split: websites unseen in training, jev-ultrafast request format; step success =
@@ -146,7 +147,7 @@ operation and target element both right)
 
 {browser}
 
-{n_all} requests; {n_all - m2w["n"]} exceed the context `{name}` is evaluated with and count as wrong for it.
+{n_all} requests; {n_all - m2w["n"]} exceed the context {name} is evaluated with and count as wrong for it.
 
 NNetNav test split (live-web steps, DONE judged by an LLM): step success {pct(acc(nn, 'step'))}, DONE recall
 {pct(done.get('recall'))}, premature DONE {pct(nn.get('premature_done_rate') if nn else None)}.
@@ -154,7 +155,7 @@ NNetNav test split (live-web steps, DONE judged by an LLM): step success {pct(ac
     if a.e2e:
         card += f"""
 **End to end** (153 held-out tasks on live websites, run by [jev-ultrafast](https://github.com/browser-use/jev-ultrafast)
-with `{name}` as its System One; success = the agent says DONE and an LLM judge reading the final page agrees):
+with {name} as its System One; success = the agent says DONE and an LLM judge reading the final page agrees):
 {a.e2e} tasks{f', vs {a.teacher_e2e} for the qwen3-max teacher behind the same agent' if a.teacher_e2e else ''}{f' and {a.glm_teacher_e2e} for the GLM-5.3-Flash teacher' if a.glm_teacher_e2e else ''}.
 Live sites differ from run to run; treat gaps of a few tasks as noise.
 """
@@ -201,7 +202,8 @@ check those terms before any commercial use.
 
 ## Citation
 
-Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China).
+Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China). The paper
+describes OpenJev under its earlier name, wev.
 
 ```bibtex
 @misc{{huang2026wev,

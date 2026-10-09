@@ -6,9 +6,11 @@
 Typed questions in, calibrated probabilities out, in one forward pass. No text generation, no API key.<br>
 <sub>Python package `wev-ai` (`import wev`) · models `OpenJev-1.7B / 4B / 8B` on the Hugging Face Hub</sub>
 
-[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20OpenJev-1.7B%20%7C%204B%20%7C%208B-ffcc4d)](https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6)
+[![Models](https://img.shields.io/badge/%F0%9F%A4%97%20OpenJev-1.7B%20%7C%204B%20%7C%208B-ffcc4d)](https://huggingface.co/collections/alanhuangya/openjev-6ab4eb5d872c9ae9fd68faa6)
 [![Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-OpenJev--Data-ffcc4d)](https://huggingface.co/datasets/alanhuangya/OpenJev-Data)
 [![pip](https://img.shields.io/badge/pip%20install-openjev--ai-3775a9?logo=pypi&logoColor=white)](https://pypi.org/project/openjev-ai/)
+[![wev-ai downloads](https://static.pepy.tech/personalized-badge/wev-ai?period=total&units=NONE&left_color=GREY&right_color=BLUE&left_text=wev-ai%20downloads)](https://pepy.tech/projects/wev-ai)
+[![openjev-ai downloads](https://static.pepy.tech/personalized-badge/openjev-ai?period=total&units=NONE&left_color=GREY&right_color=BLUE&left_text=openjev-ai%20downloads)](https://pepy.tech/projects/openjev-ai)
 [![Project page](https://img.shields.io/badge/%F0%9F%A4%97%20Project-page-ffcc4d)](https://huggingface.co/spaces/alanhuangya/wev)
 [![Paper](https://img.shields.io/badge/Paper-Zenodo-b31b1b)](https://zenodo.org/records/22941164)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22941164.svg)](https://zenodo.org/records/22941164)
@@ -19,10 +21,10 @@ Typed questions in, calibrated probabilities out, in one forward pass. No text g
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/overview.png" width="88%" alt="Interface distillation: a browser agent's typed requests are answered by a teacher LLM on live websites, an LLM judge keeps the verified episodes, and the wev decision model trained on them serves the same interface locally.">
+  <img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/overview.png" width="88%" alt="Interface distillation: a browser agent's typed requests are answered by a teacher LLM on live websites, an LLM judge keeps the verified episodes, and the OpenJev decision model trained on them serves the same interface locally.">
 </p>
 
-`wev` answers the `POST /v1/systemone` request shape: a free-form state plus any number of questions, each a
+OpenJev answers the `POST /v1/systemone` request shape: a free-form state plus any number of questions, each a
 **choice**, a **yes/no** or a **score**. It handles general decisions such as triage, routing, policy checks and
 agent monitoring, and it handles browser-agent steps: *which operation?* and *which element?* It runs on your own
 GPU, or on a laptop.
@@ -35,7 +37,7 @@ and a browser step takes 184 ms. OpenJev-8B and OpenJev-1.7B are still v0.1.
 
 - 🌐 **Browser steps on unseen websites: 79% right**, where open decision models trained on general data reach at
   most 21%.
-- 🧠 **General decisions stay strong.** OpenJev-4B scores 88.1 on Kev decision-v7 and 81.4 out of domain, and wev beats
+- 🧠 **General decisions stay strong.** OpenJev-4B scores 88.1 on Kev decision-v7 and 81.4 out of domain, and OpenJev beats
   Laya on every general benchmark.
 - 🎓 **Better than its teacher, locally.** As the System One of an open browser agent, OpenJev-4B completes 39–41 of 153
   held-out live tasks, against 27 for the qwen3-max teacher.
@@ -53,12 +55,12 @@ and a browser step takes 184 ms. OpenJev-8B and OpenJev-1.7B are still v0.1.
 
 *Median latency on one RTX 5090 (bf16), one request at a time. OpenJev-4B v0.1 stays available as the `v0.1` revision:
 `wev.load("alanhuangya/OpenJev-4B", revision="v0.1")`. OpenJev-4B v0.2 runs on a Qwen3.5 backbone and needs transformers 5;
-`pip install "wev-ai[serve,fast]"` adds its fast kernels on CUDA.*
+`pip install "openjev-ai[serve,fast]"` adds its fast kernels on CUDA.*
 
 ## Quickstart
 
 ```bash
-pip install "wev-ai[serve]"
+pip install "openjev-ai[serve]"   # installs wev-ai, the package imported as wev
 ```
 
 ```python
@@ -94,7 +96,7 @@ change that one line.
 
 ## Results
 
-<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/teaser.png" width="52%" alt="Browser step success against out-of-domain general accuracy for wev, Kev and Laya."></p>
+<p align="center"><img src="https://raw.githubusercontent.com/alanhuangyoo/OpenJev/main/assets/teaser.png" width="52%" alt="Browser step success against out-of-domain general accuracy for OpenJev, Kev and Laya."></p>
 
 Every model below receives the same requests and is scored the same way: per-question accuracy, with each model's
 most probable option taken as its answer. All numbers are on held-out test splits.
@@ -140,12 +142,12 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 <details>
 <summary><b>Notes on the comparison</b></summary>
 
-- *Kev decision-v7* is Kev's own training suite; wev also trains on its train split, and Kev leads there by 6–8
+- *Kev decision-v7* is Kev's own training suite; OpenJev also trains on its train split, and Kev leads there by 6–8
   points. *Kev transfer-v4* is out of domain for every model in the table.
-- wev and Laya (typed-decisions) train on 80% of the typed-decisions train split; Kev and plain Laya do not, so on
+- OpenJev and Laya (typed-decisions) train on 80% of the typed-decisions train split; Kev and plain Laya do not, so on
   that column they are generalists.
-- Kev and Laya ran as published, without web training data. wev is evaluated with a 4,096-token state; the 11
-  Mind2Web requests beyond it count as wrong for wev.
+- Kev and Laya ran as published, without web training data. OpenJev is evaluated with a 4,096-token state; the 11
+  Mind2Web requests beyond it count as wrong for OpenJev.
 - Live sites change from run to run, so treat end-to-end gaps of a few tasks as noise. OpenJev-4B's gain from its second
   teacher collection held on a paired comparison (10 tasks gained, 1 lost).
 - Test splits were held out from training and model selection, with one exception: OpenJev-4B v0.1 and OpenJev-8B each had
@@ -163,11 +165,11 @@ succeeds when the agent says DONE and an LLM judge, reading the final page, agre
 
 The hardest browser decision is when to stop. Accepting DONE only above a probability threshold trades missed stops
 for early ones: at 0.8, OpenJev-4B v0.1 stops early on 3.8% of unfinished steps (8.5% at 0.5), and OpenJev-8B on 1.7%.
-OpenJev-4B v0.2 stops early on 3.3% of wev-bench's unfinished steps at its default argmax.
+OpenJev-4B v0.2 stops early on 3.3% of OpenJev-Bench's unfinished steps at its default argmax.
 
 </details>
 
-## wev-bench
+## OpenJev-Bench
 
 A frozen browser lane for decision models: 2,346 steps (Mind2Web test on unseen websites, audited NNetNav test with
 its stopping and giving-up steps, and teacher steps on tasks in no train split), stored as the `bench` config of
@@ -237,7 +239,7 @@ python -m wev.webchain --out data/webchain-v1 --max_traces 4000   # downloads We
 python scripts/judge_done.py --data data/nnetnav-v2/train.jsonl --out judge-train.jsonl
 python scripts/apply_judge.py --data data/nnetnav-v2 --judge 'judge-{split}.jsonl' --out data/nnetnav-v3-clean
 
-# wev-4b v0.2: continue from Kev-4B on the v0.1 mix, then add the GLM teacher episodes (resumable: rerun the same
+# OpenJev-4B v0.2: continue from Kev-4B on the v0.1 mix, then add the GLM teacher episodes (resumable: rerun the same
 # line after a kill, on any number of GPUs), export, and fit the serving temperature on dev rows
 torchrun --nproc_per_node 8 -m wev.train --init_from jaredpalmer/kev-4b --lr 5e-5 --global_accum 8 --epochs 1 \
   --batch_tokens 4000 --resume --out runs/wev-4b-a --data <the v0.1 mix below>
@@ -247,8 +249,8 @@ torchrun --nproc_per_node 8 -m wev.train --init_from runs/wev-4b-a --lr 3e-5 --g
 wev export --run runs/wev-4b-v0.2 --out exports/wev-4b
 python scripts/calibrate.py --model exports/wev-4b --data data/m2w-v2 data/nnetnav-v3-clean data/teacher-v3-glm data/general/kev-v7 data/general/typed-decisions-train
 
-# the wev-4b v0.1 recipe; dir:K repeats a training file K times. One GPU works too: drop torchrun.
-# wev-8b and wev-1.7b use the same mix without data/teacher-v2.
+# the OpenJev-4B v0.1 recipe; dir:K repeats a training file K times. One GPU works too: drop torchrun.
+# OpenJev-8B and OpenJev-1.7B use the same mix without data/teacher-v2.
 torchrun --nproc_per_node 8 -m wev.train --base Qwen/Qwen3-4B-Base --head pointer --lr 1e-4 --epochs 1 \
   --batch_tokens 6000 --accum 1 --checkpointing 0 --out runs/wev-4b \
   --data data/m2w-v2,data/nnetnav-v3-clean,data/teacher-v1:3,data/teacher-v2:3,data/general/kev-v7:2,data/general/typed-decisions-train:8,data/ext/tasksource-jev,data/ext/jev-distill,data/ext/td-synth
@@ -257,7 +259,7 @@ wev evaluate --model runs/wev-4b --data data/general/kev-transfer-v4 --split dev
 wev export --run runs/wev-4b --out exports/wev-4b --check data/general/typed-decisions/dev.jsonl
 pytest -q tests
 
-# the Hugging Face dataset (parquet configs + the wev-bench test set) and its PII scan
+# the Hugging Face dataset (parquet configs + the OpenJev-Bench test set) and its PII scan
 python scripts/build_hf_dataset.py --data data --tasks tasks-v1.jsonl --out hf/wev-data
 python scripts/scan_pii.py --data hf/wev-data --out hf/pii-report.json
 ```
@@ -292,18 +294,19 @@ subject to its provider's terms. Treat the models as research artifacts and chec
 
 ## Limitations
 
-- English only. wev makes decisions and does not write text; in jev-ultrafast, typed values come from its separate
+- English only. OpenJev makes decisions and does not write text; in jev-ultrafast, typed values come from its separate
   text model.
 - Browser targets are scored among the candidates the agent lists (8–40 per step), not every element on the page, so
   the numbers are not comparable to the Mind2Web leaderboard.
 - Rare operations are rarely predicted: BLOCKED and scrolling have low recall. On NNetNav, OpenJev-4B says DONE too early
   on 8–10% of steps unless you threshold it.
 - On Kev's own suite, Kev is more accurate.
-- wev has not been compared with Jev itself, because we have no API access.
+- OpenJev has not been compared with Jev itself, because we have no API access.
 
 ## Citation
 
-Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China).
+Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China). The paper
+describes OpenJev under its earlier name, wev.
 
 ```bibtex
 @misc{huang2026wev,
@@ -320,5 +323,5 @@ Jun Huang and Xin Ren contributed equally (University of Electronic Science and 
 
 Apache-2.0. The model code builds on [kev](https://github.com/jaredpalmer/kev) (Apache-2.0) and uses instruction text
 from [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) (MIT); the models build on Qwen3 base models
-(Apache-2.0). wev is an independent project, not affiliated with TypeSafe AI, and does not use Jev. See
+(Apache-2.0). OpenJev is an independent project, not affiliated with TypeSafe AI, and does not use Jev. See
 [NOTICE](https://github.com/alanhuangyoo/OpenJev/blob/main/NOTICE).

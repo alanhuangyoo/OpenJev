@@ -3,8 +3,11 @@ license: other
 license_name: mixed-see-card
 language:
 - en
-pretty_name: wev data
+pretty_name: OpenJev-Data
 tags:
+- jev
+- jev-alternative
+- open-source-jev
 - browser-agent
 - web-navigation
 - decision-model
@@ -53,17 +56,19 @@ configs:
   - {split: test, path: bench/test.parquet}
 ---
 
-# wev data
+# OpenJev-Data
 
 **Jun Huang\*, Xin Ren\*** · University of Electronic Science and Technology of China · \*Equal contribution
+
+**OpenJev** is an open-source, local alternative to Jev's System One decision API: same request shape, your own GPU, no API key.
 
 Browser-step data and a benchmark for **decision models**: the small, fast models that pick a web agent's next
 operation and target element. Every row is one browser step, written as a `POST /v1/systemone` request (the page
 state plus typed questions) with its labelled answers. The requests use exactly the format the open browser agent
 [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) sends to its System One, so a model trained or scored
-here can be served behind that agent unchanged. The data trains the [wev](https://github.com/alanhuangyoo/OpenJev) models
-([wev-1.7b](https://huggingface.co/alanhuangya/OpenJev-1.7B), [wev-4b](https://huggingface.co/alanhuangya/OpenJev-4B),
-[wev-8b](https://huggingface.co/alanhuangya/OpenJev-8B)), and the `bench` config is a frozen test set, **wev-bench**, that
+here can be served behind that agent unchanged. The data trains the [OpenJev](https://github.com/alanhuangyoo/OpenJev) models
+([OpenJev-1.7B](https://huggingface.co/alanhuangya/OpenJev-1.7B), [OpenJev-4B](https://huggingface.co/alanhuangya/OpenJev-4B),
+[OpenJev-8B](https://huggingface.co/alanhuangya/OpenJev-8B)), and the `bench` config is a frozen test set, **OpenJev-Bench**, that
 scores any System One endpoint.
 
 ## Load it
@@ -80,7 +85,7 @@ qwen     = load_dataset("alanhuangya/OpenJev-Data", "teacher_qwen3max")  # qwen3
 glm      = load_dataset("alanhuangya/OpenJev-Data", "teacher_glm")       # GLM-5.3-Flash acting as System One
 onpolicy = load_dataset("alanhuangya/OpenJev-Data", "onpolicy_glm")      # student-visited states, GLM labels
 tasks    = load_dataset("alanhuangya/OpenJev-Data", "live_tasks")        # goals + start URLs; test = 153 held-out tasks
-bench    = load_dataset("alanhuangya/OpenJev-Data", "bench", split="test")  # wev-bench, frozen
+bench    = load_dataset("alanhuangya/OpenJev-Data", "bench", split="test")  # OpenJev-Bench, frozen
 ```
 
 ## Configs
@@ -92,9 +97,9 @@ bench    = load_dataset("alanhuangya/OpenJev-Data", "bench", split="test")  # we
 | `webchain` | 17,876 / 1,069 / 1,589 | [WebChain](https://huggingface.co/datasets/webagentlab/webchain) v2, converted from its HTML snapshots | CC BY 4.0 |
 | `teacher_qwen3max` | 4,781 / 385 / 57 | qwen3-max as the System One of jev-ultrafast on live sites (two collections) | see *Terms* |
 | `teacher_glm` | 5,969 / 370 / 147 | GLM-5.3-Flash in the same role | see *Terms* |
-| `onpolicy_glm` | 5,782 / 275 / 119 | DAgger-style: a wev student or the GLM teacher acts, the GLM teacher labels | see *Terms* |
+| `onpolicy_glm` | 5,782 / 275 / 119 | DAgger-style: an OpenJev student or the GLM teacher acts, the GLM teacher labels | see *Terms* |
 | `live_tasks` | 1,402 / – / 153 | goals and start URLs for live runs; `test` is the held-out end-to-end suite | see *Terms* |
-| `bench` | – / – / 2,346 | wev-bench: frozen test steps from the configs above | per row's source |
+| `bench` | – / – / 2,346 | OpenJev-Bench: frozen test steps from the configs above | per row's source |
 
 In v1 the two qwen3-max collections were separate configs (`teacher_first`, `teacher_second`); they are now one
 config with a `collection` column (`teacher-v1`, `teacher-v2`). v1 shipped JSONL; v2 ships parquet.
@@ -148,7 +153,7 @@ A request looks like this (shortened):
 A step asks for the operation and, for each operation that needs one, a target (`click_target`, `type_text_target`
 or `select_target`). A step is answered correctly when the operation and, if the operation takes one, its target both
 match. Targets are chosen among the candidates listed in the state, not among every element on the page. To train
-with the wev package, pass JSONL folders to `wev train --data`; `scripts/build_hf_dataset.py` documents the mapping.
+with the OpenJev code (the `wev` package), pass JSONL folders to `wev train --data`; `scripts/build_hf_dataset.py` documents the mapping.
 
 ## How the configs were built
 
@@ -187,7 +192,7 @@ Episodes that looped or exhausted their budget were dropped, as were repeated st
 qwen3-max's 431 DONE claims (36%) and 127 of GLM-5.3-Flash's 530 (24%).
 
 **onpolicy_glm.** Trained only on teacher episodes, a student never sees the states its own mistakes lead to. This
-config was collected DAgger-style with a mixed policy: at every step both a wev student and the GLM-5.3-Flash teacher
+config was collected DAgger-style with a mixed policy: at every step both an OpenJev student and the GLM-5.3-Flash teacher
 answered the request, one of them chosen at random with equal probability acted (`actor`: 2,894 student and 2,896
 teacher steps in train), and the teacher's choice was always recorded as the label. An episode's ending was judged
 from the actions actually executed: the judge-confirmed final state is labelled DONE, earlier teacher DONE labels
@@ -200,13 +205,13 @@ of any config, and `validation` otherwise. NNetNav-sourced tasks take their goal
 teacher test splits hold only the Google Flights and Wikipedia tasks: 323 steps from 8 tasks.
 
 **live_tasks.** Goals paired with start URLs: NNetNav goals on their live sites, Wikipedia look-ups and Google
-Flights searches. The 153 `test` tasks are the end-to-end suite used to evaluate the wev models; none of them appears
+Flights searches. The 153 `test` tasks are the end-to-end suite used to evaluate the OpenJev models; none of them appears
 in a teacher config. Checked by task id and by goal against every train split: one eval goal ("Find hotels in San
 Francisco." on booking.com) also occurs at one step of `nnetnav_audited` train, because NNetNav repeats some goals
 across its own splits. The 123 NNetNav eval tasks come from NNetNav's test split, so their goals appear in
 `nnetnav_audited` test (555 steps); that is by construction, not a leak.
 
-## wev-bench
+## OpenJev-Bench
 
 `bench` is a frozen test set for browser decision models: 2,346 steps, each a request a System One must answer.
 
@@ -218,7 +223,7 @@ across its own splits. The 123 NNetNav eval tasks come from NNetNav's test split
 
 Two Mind2Web test requests are left out because one question exceeds the API's 255-option limit.
 
-**Metrics.** A step succeeds when the operation and, if the step has one, the target are right. wev-bench reports
+**Metrics.** A step succeeds when the operation and, if the step has one, the target are right. OpenJev-Bench reports
 step success, operation accuracy, target accuracy, the premature-DONE rate (steps whose gold operation is not DONE
 that the model answered DONE: an agent that stops early abandons its task), DONE recall, top-label ECE (10 bins; on
 the probability the model gives its own choice) and p50/p95 latency per request, overall and per subset. Conventions
@@ -233,17 +238,19 @@ python scripts/wev_bench.py --url http://127.0.0.1:8009/v1/systemone --name my-m
   --hardware "RTX 5090, bf16" --out results/wev-bench/my-model.json
 ```
 
-The script is in the [wev repository](https://github.com/alanhuangyoo/OpenJev/blob/main/scripts/wev_bench.py) and needs
+The script is in the [OpenJev repository](https://github.com/alanhuangyoo/OpenJev/blob/main/scripts/wev_bench.py) and needs
 only the Python standard library and `pyarrow`. The result is a JSON file in JevBench's per-system layout (`key`,
 `display`, `open`, `licence`, `has_distribution`, a `browser` lane block with `by_family`, `speed_block`, ...), plus
 the dataset revision and the bench file's sha256, so it can be submitted to a leaderboard as is.
 
 | System One | Step success | Operation | Target | Premature DONE | ECE | p50 / p95 latency |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| wev-4b | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
+| **OpenJev-4B v0.2** | **73.1** | **84.7** | **81.4** | **3.3** | **0.013** | **153 / 353 ms** |
+| OpenJev-4B v0.1 | 68.0 | 81.3 | 79.0 | 5.0 | 0.051 | 166 / 409 ms |
 
-wev-4b was served with `wev serve` on one RTX 5090 (bf16) and queried serially from the same host. Its training
-included `mind2web`, `nnetnav_audited` and `teacher_qwen3max` train splits, so it is in-distribution there.
+Both were served with `wev serve` on one RTX 5090 (bf16) and queried serially from the same host. Their training
+included the `mind2web`, `nnetnav_audited` and `teacher_qwen3max` train splits (v0.2 also `teacher_glm`), so they are
+in-distribution there.
 
 ## Personal and sensitive information
 
@@ -284,7 +291,8 @@ those websites' terms; its card asks users not to attempt to recover personal in
 
 ## Citation
 
-Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China).
+Jun Huang and Xin Ren contributed equally (University of Electronic Science and Technology of China). The paper
+describes OpenJev under its earlier name, wev.
 
 ```bibtex
 @misc{huang2026wev,

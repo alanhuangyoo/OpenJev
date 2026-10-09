@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenJev (wev): open-source local alternative to Jev</title>
-<meta name="description" content="wev distils LLM browser agents into open, local System-One decision models: typed questions in, calibrated probabilities out, in one forward pass.">
+<title>OpenJev: open-source local alternative to Jev</title>
+<meta name="description" content="OpenJev distils LLM browser agents into open, local System-One decision models: typed questions in, calibrated probabilities out, in one forward pass.">
 <style>
   :root {
     --bg: #ffffff; --bg-soft: #f6f7f9; --ink: #16181d; --ink-2: #4a4f5a; --ink-3: #6b7280;
@@ -63,7 +63,7 @@
 <body>
 <main>
 
-  <h1><span class="name">wev</span>: Distilling LLM Browser Agents into<br>Open, Local System-One Decision Models</h1>
+  <h1><span class="name">OpenJev</span>: Distilling LLM Browser Agents into<br>Open, Local System-One Decision Models</h1>
 
   <div class="authors">Jun Huang<sup>*</sup> &nbsp;·&nbsp; Xin Ren<sup>*</sup></div>
   <p class="aff">University of Electronic Science and Technology of China &nbsp;·&nbsp; <sup>*</sup>Equal contribution</p>
@@ -71,9 +71,9 @@
   <div class="buttons">
     <a class="btn" href="https://zenodo.org/records/22941164">📄 Paper</a>
     <a class="btn" href="https://github.com/alanhuangyoo/OpenJev">💻 Code</a>
-    <a class="btn" href="https://huggingface.co/collections/alanhuangya/wev-6ab4eb5d872c9ae9fd68faa6">🤗 Models</a>
+    <a class="btn" href="https://huggingface.co/collections/alanhuangya/openjev-6ab4eb5d872c9ae9fd68faa6">🤗 Models</a>
     <a class="btn" href="https://huggingface.co/datasets/alanhuangya/OpenJev-Data">🗂️ Dataset</a>
-    <a class="btn alt" href="https://pypi.org/project/wev-ai/">pip install wev-ai</a>
+    <a class="btn alt" href="https://pypi.org/project/openjev-ai/">pip install openjev-ai</a>
   </div>
 
   <p class="tagline"><b>v0.2:</b> OpenJev-4B completes 39–41 of 153 live-website tasks (from 30), with calibrated
@@ -82,7 +82,7 @@
 
   <div class="fig"><img src="overview.png" alt="Interface distillation overview"></div>
   <p class="caption">Interface distillation: a teacher LLM answers a browser agent's typed requests on live websites, an
-  LLM judge keeps the verified episodes, and the wev student serves the same interface locally.</p>
+  LLM judge keeps the verified episodes, and the OpenJev student serves the same interface locally.</p>
 
   <div class="stats">
     <div class="stat"><div class="v">79%</div><div class="l">browser steps right on unseen websites (next best open model: 21%)</div></div>
@@ -91,7 +91,7 @@
     <div class="stat"><div class="v">36%</div><div class="l">of the teacher's own DONE claims rejected by the judge</div></div>
   </div>
 
-  <h2>Abstract</h2>
+  <h2>Abstract <span style="font-weight:400;font-size:0.7em">(paper, v0.1 models)</span></h2>
   <p>System-One decision models answer typed questions about a free-form state with a probability for every declared
   option, in one forward pass and without generating text, but the open models of this kind are trained on general
   decision data and reach at most 21% step success on browser steps from unseen websites. We observe that the typed
@@ -108,7 +108,7 @@
   <div class="two">
     <div>
       <div class="fig"><img src="teaser.png" alt="Browser step success against out-of-domain general accuracy"></div>
-      <p class="caption">Only wev is strong on both browser steps and general decisions.</p>
+      <p class="caption">Only OpenJev is strong on both browser steps and general decisions.</p>
     </div>
     <div>
       <table>
@@ -122,7 +122,7 @@
         <tr><td>Laya</td><td>0.0</td><td>63.7</td><td>36.2</td></tr>
       </table>
       <p class="note">Test splits, same scorer for every model. Browser step: Mind2Web step success on unseen websites.
-      Transfer: Kev transfer-v4, out of domain for all models. Typed-dec.: typed-decisions, on which wev and Laya
+      Transfer: Kev transfer-v4, out of domain for all models. Typed-dec.: typed-decisions, on which OpenJev and Laya
       (typed-dec.) train.</p>
     </div>
   </div>
@@ -130,14 +130,14 @@
   <h2>Models</h2>
   <table>
     <tr><th>Model</th><th>Size</th><th>Best for</th><th>General decision</th><th>Browser step</th></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-4B">OpenJev-4B</a> (v0.2)</td><td>8.4 GB</td><td>default; best on live websites</td><td>40 ms</td><td>184 ms</td></tr>
-    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-8B">OpenJev-8B</a></td><td>15.2 GB</td><td>most accurate out of domain</td><td>21 ms</td><td>322 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-4B">OpenJev-4B</a> (v0.2)</td><td>8.4 GB</td><td>default; best on live websites and out of domain</td><td>40 ms</td><td>184 ms</td></tr>
+    <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-8B">OpenJev-8B</a></td><td>15.2 GB</td><td>a larger v0.1 model</td><td>21 ms</td><td>322 ms</td></tr>
     <tr class="ours"><td><a href="https://huggingface.co/alanhuangya/OpenJev-1.7B">OpenJev-1.7B</a></td><td>3.5 GB</td><td>laptops; the fastest</td><td>10 ms</td><td>91 ms</td></tr>
   </table>
   <p class="note">Median latency on one RTX 5090 (bf16), one request at a time.</p>
 
   <h2>Quickstart</h2>
-  <div class="copy-wrap"><button class="copy" data-target="qs">Copy</button><pre id="qs">pip install "wev-ai[serve]"
+  <div class="copy-wrap"><button class="copy" data-target="qs">Copy</button><pre id="qs">pip install "openjev-ai[serve]"   # installs wev-ai, imported as wev
 
 import wev
 m = wev.load("alanhuangya/OpenJev-4B")
@@ -152,6 +152,7 @@ out = m.predict(
 wev serve --model alanhuangya/OpenJev-4B --port 8009</pre></div>
 
   <h2>Citation</h2>
+  <p class="note">The paper describes OpenJev under its earlier name, wev.</p>
   <div class="copy-wrap"><button class="copy" data-target="bib">Copy</button><pre id="bib">@misc{huang2026wev,
   title     = {wev: Distilling LLM Browser Agents into Open, Local System-One Decision Models},
   author    = {Huang, Jun and Ren, Xin},
@@ -162,7 +163,7 @@ wev serve --model alanhuangya/OpenJev-4B --port 8009</pre></div>
 }</pre></div>
 
   <footer>
-    wev is an independent project, not affiliated with TypeSafe AI. Code under Apache-2.0; see the
+    OpenJev is an independent project, not affiliated with TypeSafe AI. Code under Apache-2.0; see the
     <a href="https://github.com/alanhuangyoo/OpenJev">repository</a> for licenses and acknowledgements.
   </footer>
 </main>
